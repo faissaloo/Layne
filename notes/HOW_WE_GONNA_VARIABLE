@@ -1,0 +1,10 @@
+We're going to have a dictionary for every context,
+when a new variable is declared we add an item to that dictionary
+by the name of that variable
+The C++ source is gonna be something like this
+
+If the variable doesn't exist this will just abort
+object.getVar("variableName")
+
+This will handle setting, if the variable doesn't exist it gets created
+object.setVar("variableName",whatever)

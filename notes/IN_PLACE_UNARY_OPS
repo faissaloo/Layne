@@ -1,0 +1,2 @@
+Instead of doing x=!x or x=-x or x=~x we should be able to do this in place with something like
+$~x, $-x or $!x

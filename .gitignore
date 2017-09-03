@@ -1,0 +1,4 @@
+*.l
+*.o
+*.out
+lib/parserdata/

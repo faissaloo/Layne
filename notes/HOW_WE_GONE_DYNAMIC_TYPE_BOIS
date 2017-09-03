@@ -1,0 +1,40 @@
+So bayyyyysically yeeeeh:
+Compiler generates a switch statement for every possible
+expression that contains a case for each defined class as well
+as atomic type and uses that to set the void pointer in the var
+struct according to type_id().hash()
+Whenever a variable is assigned, created etc we follow the
+switch.
+cur_type is a member of each var that holds a hash of the
+current type
+data is the void pointer to the data currently being contained
+
+switch (inVar.cur_type)
+{
+	case type_id(float).hash_code():
+		//Cast accordingly, do the operation we want
+		//then return
+		break;
+
+}
+
+Constructors will follow this pattern:
+	data=new DATATYPE(OPERAND);
+	cur_type=type_id(OPERAND).hash_code()
+
+Operations will follow this pattern:
+	void* olddata=data;
+	data=new DATATYPE(*((DATATYPE*)data)+OPERAND);
+	delete ((DATATYPE*)olddata);
+	return *this;
+
+When the variable is destroyed, or reassigned a different value
+this pattern will be followed:
+	delete (DATATYPE*)data;
+	break;
+						
+
+Atomic types are encapsulated by an abstraction class, these
+will have the methods (including those for operations) in them
+that use the 'variable' data type. Literals will be encapsulated
+by the atomic abstraction class that corresponds to their type.

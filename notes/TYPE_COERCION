@@ -1,0 +1,1 @@
+See I was gonna do type coercion, but in looking at ways to implement it I figured I should go with stronger typing than Python because it makes an inconsistent mess otherwise

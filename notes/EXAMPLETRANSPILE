@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+#include <gc.h>
+#include "global_obj.h"
+#include "dyn_objs.h"
+#include "int_obj.h"
+#include "str_obj.h"
+#include "type_obj.h"
+#include "bool_obj.h"
+#include "none_obj.h"
+#include "debug.h"
+
+int main()
+{
+	//Put this stuff in a macro in a file dedicated to creating the environment
+	//Later we need to make it so that the argv arrays are imported into the environment
+	GC_INIT();
+	//We need the global object
+	create_global();
+
+	//ret int.new()
+	return get_int_val(call_method(get_member(global,"int"),"or",dyn_array_from(2,(void *[]){create_int(91),create_int(91)})));
+}

@@ -1,0 +1,2 @@
+EVERYTHING SHOULD BE HASHABLE
+We're not gonna be like Python and make countless different objects just so we can make dictionaries, we'll do stuff all with mutability and if the user makes it so the hash changes that's their problem they should've copied it with the copy operator before making it a key
