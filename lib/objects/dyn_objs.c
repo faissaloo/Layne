@@ -118,7 +118,7 @@ struct dyn_obj **type_parent_list[]={
 	&type_factory, //Global
 	&type_factory, //None
 	&type_factory, //Func
-	&bool_factory, //Int
+	&type_factory, //Int
 	&type_factory, //Flt
 	&type_factory, //Bool
 	&type_factory, //Str
