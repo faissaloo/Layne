@@ -58,7 +58,6 @@ struct dyn_obj *create_int_factory()
 
 	inherit_factory_setup();
 	//init_methods(self,&factory_int_methods);
-
 	return self;
 }
 

@@ -232,6 +232,18 @@ struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], struct dyn_
 	return call_function(get_member(obj,method_name),args);
 }
 
+//Calls a method which only passes self to the object
+struct dyn_obj* call_method_noargs(struct dyn_obj *obj, char method_name[])
+{
+	return call_function(get_member(obj,method_name),dyn_array_from(1,(void *[]){obj}));
+}
+
+//Registers the destructor for the object
+void reg_destructor(struct dyn_obj *obj)
+{
+	GC_register_finalizer(obj,(GC_finalization_proc)call_method_noargs,"del",0,0);
+}
+
 bool is_child(struct dyn_obj *obj,enum type type_id)
 {
 	//Descend through the linked list of parents until we reach the TYPE object or a match

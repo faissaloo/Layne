@@ -31,5 +31,4 @@ struct func_obj
 extern struct method_list func_methods;
 extern struct method_list factory_func_methods;
 decl_dyn_fn(func_copy);
-
 #endif

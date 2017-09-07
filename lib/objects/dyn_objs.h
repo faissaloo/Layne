@@ -168,8 +168,10 @@ void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)
 struct dyn_obj* get_member(struct dyn_obj *obj,char member_name[]);
 struct dyn_obj* copy_obj(struct dyn_obj *obj,struct hash_table *spanned_objs);
 struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], struct dyn_array *args);
+struct dyn_obj* call_method_noargs(struct dyn_obj *obj, char method_name[]);
 struct dyn_obj* call_function(struct dyn_obj *object_to_call, struct dyn_array *args);
 bool is_child(struct dyn_obj *obj,enum type type_id);
+void reg_destructor(struct dyn_obj *obj);
 
 extern struct dyn_obj *global;
 extern struct dyn_obj *type_factory;
