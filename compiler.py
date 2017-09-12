@@ -232,6 +232,9 @@ class fltLiteral(literal):
 	def __repr__(self):
 		return str(self.contents)
 
+	def C(self):
+		return 'create_flt('+str(self.contents)+')'
+
 class intLiteral(literal):
 	def __init__(self,contents):
 		self.contents=int(contents)
@@ -249,6 +252,9 @@ class binLiteral(literal):
 	def __repr__(self):
 		return bin(self.contents)
 
+	def C(self):
+		return "create_int("+str(self.contents)+")"
+
 class hexLiteral(literal):
 	def __init__(self,contents):
 		self.contents=int(contents,16)
@@ -256,6 +262,9 @@ class hexLiteral(literal):
 	def __repr__(self):
 		return hex(self.contents)
 
+	def C(self):
+		return "create_int("+str(self.contents)+")"
+	
 class variable():
 	def __init__(self,name):
 		self.name=name
