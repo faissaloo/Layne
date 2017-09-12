@@ -222,6 +222,8 @@ class literal():
 class strLiteral(literal):
 	def __repr__(self):
 		return '"'+self.contents+'"'
+	def C(self):
+		return 'create_str(dyn_str_from_cstr("'+self.contents+'"))'
 
 class fltLiteral(literal):
 	def __init__(self,contents):

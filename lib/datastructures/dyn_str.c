@@ -112,6 +112,14 @@ struct dyn_str* dyn_str_get_char(struct dyn_str *self, int pos)
 	return new_str;
 }
 
+struct dyn_str* dyn_str_from_cstr(char str[])
+{
+	struct dyn_str *to_ret;
+	to_ret=dyn_str_create();
+	dyn_str_cat_cstr(to_ret,str);
+	return to_ret;
+}
+
 struct dyn_str* dyn_str_from_int(int n)
 {
 	struct dyn_str *new_str;
