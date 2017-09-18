@@ -264,7 +264,7 @@ class hexLiteral(literal):
 
 	def C(self):
 		return "create_int("+str(self.contents)+")"
-	
+
 class variable():
 	def __init__(self,name):
 		self.name=name
@@ -486,6 +486,12 @@ class parenthExpr():
 	def __repr__(self):
 		return str(self.tree)
 
+	def C(self):
+		if self.tree:
+			return "("+self.tree.C()+")"
+		else:
+			return "()"
+
 class brackExpr():
 	def __init__(self,tree):
 		if len(parenthTok)>0:
@@ -556,6 +562,8 @@ class ifStatement(inheritContextStatement):
 		self.code=code
 	def __repr__(self):
 		return "IF "+str(self.expr)+"\n"+str(self.code)
+	def C(self):
+		return 'if (get_bool_val(call_method_noargs('+self.expr.C()+',"bool")))\n'+self.code.C()
 
 class forStatement(inheritContextStatement):
 	def __init__(self,iterator,toIterate,code):
