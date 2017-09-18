@@ -153,9 +153,9 @@ struct dyn_obj* get_member(struct dyn_obj *obj,char member_name[])
 
 void init_methods(struct dyn_obj *self, const struct method_list *methods)
 {
-	for (iter_t i=0;i<=methods->count;i++)
+	for (iter_t i=1;i<=methods->count;i++)
 	{
-		bind_method(self,methods->method_pair[i].method_name,methods->method_pair[i].method);;
+		bind_method(self,methods->method_pair[i-1].method_name,methods->method_pair[i-1].method);;
 	}
 }
 
