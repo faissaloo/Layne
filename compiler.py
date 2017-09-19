@@ -290,7 +290,7 @@ class isOp(dyadicOp):
 
 class dotOp(dyadicOp):
 	def C(self):
-		return "get_member("+str(self.operand1.C())+',"'+str(self.operand2.C())+'")'
+		return "get_member("+self.operand1.C()+',"'+self.operand2.C()+'")'
 
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" . "+self.operand2.__repr__()+")"
@@ -541,7 +541,7 @@ class funcCall():
 			i=i.operand1
 		if i:
 			args.insert(0,i.C())
-		return "call_method("+str(self.name.operand1)+',"'+str(self.name.operand2)+'",dyn_array_from('+str(len(args))+',(void *[]){'+(','.join(args))+'})'
+		return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",dyn_array_from('+str(len(args))+',(void *[]){'+(','.join(args))+'})'
 
 class statement():
 	pass
@@ -788,6 +788,7 @@ def parseLayer(tokens,noAssign=False):
 				tree.consumeItem(binLiteral)
 			elif i[0]=="hex":
 				tree.consumeItem(hexLiteral)
+
 	for i in tree:
 		if type(i) is tuple:
 			if i[0]=="mdop":
