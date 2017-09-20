@@ -541,7 +541,7 @@ class funcCall():
 			i=i.operand1
 		if i:
 			args.insert(0,i.C())
-		return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",dyn_array_from('+str(len(args))+',(void *[]){'+(','.join(args))+'})'
+		return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",dyn_array_from('+str(len(args))+',(void *[]){'+(','.join(args))+'}))'
 
 class statement():
 	pass
@@ -1159,17 +1159,23 @@ class declGen():
 
 	def genHeader(self):
 		to_ret="#ifndef MAIN_H\n#define MAIN_H\n"
-		to_ret+='extern struct method_list '+('extern struct method_list '.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods;\n" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
-		to_ret+='extern struct method_list '+('extern struct method_list '.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods;\n" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+		if self.names:
+			to_ret+='extern struct method_list '+('extern struct method_list '.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods;\n" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+			to_ret+='extern struct method_list '+('extern struct method_list '.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods;\n" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
 		to_ret+="#endif\n"
 		return to_ret
 
 	def genObjMethodListRefs(self):
-		return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+		if self.names:
+			return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+		else:
+			return ""
 
 	def genObjFactoryMethodListRefs(self):
-		return '\t,\n\t&'+(',\n\t&'.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
-
+		if self.names:
+			return '\t,\n\t&'+(',\n\t&'.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+		else:
+			return ""
 	def genMain(self):
 		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "debug.h"\n'
 		for i in self.names:
