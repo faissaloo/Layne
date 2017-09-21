@@ -282,7 +282,6 @@ class dyadicOp():
 	def __init__(self,operand1,operand2):
 		self.operand1=operand1
 		self.operand2=operand2
-
 #Checks whether item on the left is an instance of the type on the right
 class isOp(dyadicOp):
 	def __repr__(self):
@@ -302,40 +301,57 @@ class commaOp(dyadicOp):
 class mulOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" * "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"mul",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class divOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" / "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"div",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class modOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" % "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"mod",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 #Bitwise operations
 class bitLshOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" << "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"lsh",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitRshOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" >> "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"rsh",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitAndOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" & "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"and",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitOrOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" | "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"or",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitXorOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" ^ "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"xor",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class addOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" + "+self.operand2.__repr__()+")"
-
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"add",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 class minusOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" - "+self.operand2.__repr__()+")"
@@ -355,19 +371,27 @@ class uMinusOp(unaryOp):
 class andOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" AND "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"band",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class orOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" OR "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"bor",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class notOp(unaryOp):
 	def __repr__(self):
 		return "NOT "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"not")'
 
 #For when you want to pass by copy and not by reference
 class copyOp(unaryOp):
 	def __repr__(self):
 		return "@ "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"copy")'
 
 class unaryAssignment(unaryOp):
 	pass
@@ -375,18 +399,26 @@ class unaryAssignment(unaryOp):
 class iPosAssign(unaryAssignment):
 	def __repr__(self):
 		return "$+ "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"ipos")'
 
 class iNegAssign(unaryAssignment):
 	def __repr__(self):
 		return "$- "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"ineg")'
 
 class iNotAssign(unaryAssignment):
 	def __repr__(self):
 		return "$! "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"ibnot")'
 
 class iBitNotAssign(unaryAssignment):
 	def __repr__(self):
 		return "$~ "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"inot")'
 
 class assignment(dyadicOp):
 	pass
@@ -398,58 +430,86 @@ class copyAssign(assignment):
 class addAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" += "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"iadd",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class minusAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" -= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"isub",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class mulAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" *= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"imul",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class divAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" /= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"idiv",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitAndAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" &= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"iand",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitOrAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" |= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"ior",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitXorAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" ^= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"ixor",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitRshAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" >>= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"irsh",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class bitLshAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" <<= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"ilsh",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class greaterThan(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" > "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"gt",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class greaterThanEqualTo(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" >= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"ge",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class lessThan(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" < "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"lt",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class lessThanEqualTo(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" <= "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"le",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class notEqualTo(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" != "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"ne",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 
 class retStatement(unaryOp):
 	def __repr__(self):
