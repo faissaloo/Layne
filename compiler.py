@@ -537,6 +537,17 @@ class equalOp(dyadicOp):
 		else:
 			return "("+self.operand1.__repr__()+" := "+self.operand2.__repr__()+")"
 
+	def C(self):
+		if self.isCmp:
+			return 'call_method('+self.operand1.C()+',"eq",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
+		elif self.isAssign:
+			if isinstance(self.operand1,dotOp):
+				return 'bind_member('+self.operand1.operand1.C()+',"'+self.operand1.operand2.C()+'",'+self.operand2.C()+')'
+			else:
+				return self.operand1.C()+'='+self.operand2.C();
+		else:
+			return ''
+
 class parenthExpr():
 	def __init__(self,parenthTok):
 		if len(parenthTok)>0:
