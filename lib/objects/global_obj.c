@@ -16,6 +16,7 @@
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gc.h>
+#include <stdio.h>
 
 #include "dyn_objs.h"
 #include "global_obj.h"
@@ -26,6 +27,7 @@
 #include "flt_obj.h"
 #include "bool_obj.h"
 #include "none_obj.h"
+#include "debug.h"
 
 struct dyn_obj *global;
 struct dyn_obj *type_factory;
@@ -34,8 +36,8 @@ struct dyn_obj *flt_factory;
 struct dyn_obj *bool_factory;
 struct dyn_obj *str_factory;
 
-struct method_list global_methods={0,{}};
-struct method_list factory_global_methods={0,{}};
+struct method_list global_methods={1,{"print",global_print}};
+struct method_list factory_global_methods={1,{"print",factory_global_print}};
 
 struct dyn_obj* create_global()
 {
@@ -53,4 +55,13 @@ struct dyn_obj* create_global()
 	bind_member(self,"bool",bool_factory);
 	bind_member(self,"str",str_factory);
 	return self;
+}
+
+def_dyn_fn(global_print)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","str"}),protect({GLOBAL,STR}));
+	#endif
+	printf("%s",*get_str_val(get_arg(1))->raw);
+
 }
