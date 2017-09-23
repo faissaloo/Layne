@@ -544,7 +544,7 @@ class equalOp(dyadicOp):
 			if isinstance(self.operand1,dotOp):
 				return 'bind_member('+self.operand1.operand1.C()+',"'+self.operand1.operand2.C()+'",'+self.operand2.C()+')'
 			else:
-				return self.operand1.C()+'='+self.operand2.C();
+				return self.operand1.C()+'='+self.operand2.C()
 		else:
 			return ''
 
@@ -1230,9 +1230,10 @@ class declGen():
 
 	def genHeader(self):
 		to_ret="#ifndef MAIN_H\n#define MAIN_H\n"
-		if self.names:
-			to_ret+='extern struct method_list '+('extern struct method_list '.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods;\n" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
-			to_ret+='extern struct method_list '+('extern struct method_list '.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods;\n" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+		for i in self.names:
+			if isinstance(i[-1],objStatement):
+				to_ret+='extern struct method_list OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_methods;\n'
+				to_ret+='extern struct method_list factory_OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_methods;\n'
 		to_ret+="#endif\n"
 		return to_ret
 
@@ -1297,7 +1298,11 @@ class declGen():
 				(''.join([',"'+str(iii.var)+'"' for iii in ii[-1].param]))+
 				'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(iii.type.C())+")->type_to_create") if iii.type else ",TYPE" for iii in ii[-1].param]))+
 				'}));\n\t#endif\n')
-
+			for iii,j in enumerate(ii[-1].param):
+				if j.default:
+					to_ret+='\tstruct dyn_str* '+str(j.var)+'=args->filled>='+str(iii)+'?get_arg('+str(iii)+'):'+j.default.C()+';\n'
+				else:
+					to_ret+='\tstruct dyn_str* '+str(j.var)+'=get_arg('+str(iii)+');\n'
 			to_ret+=ii[-1].code.C()+"\n}\n\n"
 			return to_ret
 
@@ -1311,8 +1316,8 @@ class declGen():
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(i[-1].new[-1].minLen())+','+str(i[-1].new[-1].maxLen())+',protect({"self"'+(''.join([',"'+str(ii.var)+'"' for ii in i[-1].new[-1].param]))+'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(ii.type.C())+")->type_to_create") if ii.type else ",TYPE" for ii in i[-1].new[-1].param]))+'}));\n\t#endif\n\tobject_setup('+i[-1].enum+');\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinherit_setup();\n'+i[-1].new[-1].code.C()+'\n}\n'
 				else:
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\tstruct dyn_obj *self = call_method(*type_parent_list[self->cur_type],"new",args);\n\tself->cur_type = '+i[-1].enum+';\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinit_methods(self,type_method_lists[self->cur_type]);\n\treturn self;\n}\n'
-			#elif isinstance(i[-1],funcStatement) and i[-1].name.name!="new":
-			#	to_ret+=funcGen(i)
+			elif isinstance(i[-1],funcStatement) and len(i)==1 and i[-1].name.name!="new": #Top level global functions
+				to_ret+=funcGen(i)
 		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=global;\n"
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
