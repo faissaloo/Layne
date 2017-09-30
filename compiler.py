@@ -612,8 +612,10 @@ class funcCall():
 			i=i.operand1
 		if i:
 			args.insert(0,i.C())
-		return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",dyn_array_from('+str(len(args))+',(void *[]){'+(','.join(args))+'}))'
-
+		if isinstance(self.name,dotOp):
+			return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",dyn_array_from('+str(len(args))+',(void *[]){'+(','.join(args))+'}))'
+		else:
+			return "call_function("+self.name.C()+',dyn_array_from('+str(len(args)+1)+',(void *[]){create_none(),'+(','.join(args))+'}))'
 class statement():
 	pass
 
