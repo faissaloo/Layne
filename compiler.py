@@ -1299,11 +1299,12 @@ class declGen():
 				(''.join([',"'+str(iii.var)+'"' for iii in ii[-1].param]))+
 				'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(iii.type.C())+")->type_to_create") if iii.type else ",TYPE" for iii in ii[-1].param]))+
 				'}));\n\t#endif\n')
+			to_ret+='\tstruct dyn_obj* self=get_arg(0);\n'
 			for iii,j in enumerate(ii[-1].param):
 				if j.default:
-					to_ret+='\tstruct dyn_str* '+str(j.var)+'=args->filled>='+str(iii)+'?get_arg('+str(iii)+'):'+j.default.C()+';\n'
+					to_ret+='\tstruct dyn_str* '+str(j.var)+'=args->filled>='+str(iii)+'?get_arg('+str(iii+1)+'):'+j.default.C()+';\n'
 				else:
-					to_ret+='\tstruct dyn_str* '+str(j.var)+'=get_arg('+str(iii)+');\n'
+					to_ret+='\tstruct dyn_str* '+str(j.var)+'=get_arg('+str(iii+1)+');\n'
 			to_ret+=ii[-1].code.C()+"\n}\n\n"
 			return to_ret
 		#We're not generating anything for functions in functions... Deal with that
