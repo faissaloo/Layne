@@ -1307,8 +1307,7 @@ class declGen():
 					to_ret+='\tstruct dyn_str* '+str(j.var)+'=get_arg('+str(iii+1)+');\n'
 			to_ret+=ii[-1].code.C()+"\n}\n\n"
 			return to_ret
-		#We're not generating anything for functions in functions... Deal with that
-		#Have this setup to divide between functions in objects, top level functions and functions in functions
+		
 		for i in self.names:
 			i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
 
