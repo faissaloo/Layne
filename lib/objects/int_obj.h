@@ -56,4 +56,6 @@ decl_dyn_fn(int_xor);
 
 decl_dyn_fn(int_copy);
 decl_dyn_fn(int_hash);
+
+decl_dyn_fn(int_neg);
 #endif

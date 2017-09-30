@@ -364,9 +364,11 @@ class uAddOp(unaryOp):
 	def __repr__(self):
 		return "+ "+self.operand.__repr__()
 
-class uMinusOp(unaryOp):
+class negOp(unaryOp):
 	def __repr__(self):
 		return "- "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"neg")'
 
 class andOp(dyadicOp):
 	def __repr__(self):
@@ -950,7 +952,7 @@ def parseLayer(tokens,noAssign=False):
 						tree.consumeDyadic(addOp)
 				elif i[1]=="-":
 					if tree.isUnary():
-						tree.consumeUnary(uMinusOp)
+						tree.consumeUnary(negOp)
 					else:
 						tree.consumeDyadic(minusOp)
 			elif i[0]=="uop":

@@ -29,7 +29,7 @@
 struct dyn_obj *global;
 
 struct method_list factory_int_methods={
-	17,
+	18,
 	{
 		{"new",factory_int_new},
 		{"add",factory_int_add},
@@ -47,7 +47,8 @@ struct method_list factory_int_methods={
 		{"ge",factory_int_ge},
 		{"or",factory_int_or},
 		{"and",factory_int_and},
-		{"xor",factory_int_xor}
+		{"xor",factory_int_xor},
+		{"neg",factory_int_neg}
 	}
 };
 struct dyn_obj *create_int_factory()
@@ -67,7 +68,7 @@ int get_int_val(struct dyn_obj *obj)
 }
 
 struct method_list int_methods={
-	17,
+	18,
 	{
 		{"new",int_new},
 		{"add",int_add},
@@ -85,7 +86,8 @@ struct method_list int_methods={
 		{"ge",int_ge},
 		{"or",int_or},
 		{"and",int_and},
-		{"xor",int_xor}
+		{"xor",int_xor},
+		{"neg",int_neg}
 	}
 };
 
@@ -269,4 +271,13 @@ def_dyn_fn(int_xor)
 	#endif
 
 	return create_int(get_int_val(SELF)^get_int_val(get_arg(1)));
+}
+
+def_dyn_fn(int_neg)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self"}),protect({INT}));
+	#endif
+
+	return create_int(-get_int_val(SELF));
 }
