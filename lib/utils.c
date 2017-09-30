@@ -111,11 +111,12 @@ void int_to_str(int n,char *buff)
 	}
 
 	buff+=uint_len(n);
-	while (n!=0)
+	do
 	{
 		buff--;
 		//On x86 DIV (integer divide) outputs both remainder and the rest so this should optimise to just one instruction unless some other trickery gets done
 		*buff='0'+(n%10);
 		n/=10;
 	}
+	while (n!=0);
 }
