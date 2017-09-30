@@ -1302,12 +1302,12 @@ class declGen():
 			to_ret+='\tstruct dyn_obj* self=get_arg(0);\n'
 			for iii,j in enumerate(ii[-1].param):
 				if j.default:
-					to_ret+='\tstruct dyn_str* '+str(j.var)+'=args->filled>='+str(iii)+'?get_arg('+str(iii+1)+'):'+j.default.C()+';\n'
+					to_ret+='\tstruct dyn_str* '+str(j.var)+'=args->filled>='+str(iii+1)+'?get_arg('+str(iii+1)+'):'+j.default.C()+';\n'
 				else:
 					to_ret+='\tstruct dyn_str* '+str(j.var)+'=get_arg('+str(iii+1)+');\n'
 			to_ret+=ii[-1].code.C()+"\n}\n\n"
 			return to_ret
-		
+
 		for i in self.names:
 			i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
 
