@@ -666,7 +666,7 @@ class objStatement(newContextStatement):
 		return "OBJ "+self.name.name+" FROM "+(str(self.parent) if self.parent else "")+""+"\n"+str(self.code)
 
 	def C(self):
-		return 'bind_member(self,"'+self.name.C()+'",*type_factory_list['+self.enum+']);\n'
+		return 'struct dyn_obj *'+self.name.C()+'=*type_factory_list['+self.enum+'];\n'
 
 class funcParamList(list):
 	def __init__(self,tree):
@@ -729,7 +729,7 @@ class funcStatement(newContextStatement):
 
 	#This just binds the real name of the C function to the object with bind_method
 	def C(self):
-		return 'bind_method(self,"'+self.name.C()+'",'+self.cfunc+');\n'
+		return 'struct dyn_obj *'+self.name.C()+' = create_function('+self.cfunc+');\n'
 
 	def __repr__(self):
 		return "FUNCTION "+str(self.prototype)+"\n"+str(self.code)
@@ -1249,7 +1249,7 @@ class declGen():
 		else:
 			return ""
 	def genMain(self):
-		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "debug.h"\n'
+		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "debug.h"\n'
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
 				has_new=False
@@ -1290,7 +1290,6 @@ class declGen():
 		#Method implementations
 		#Search for things in our list that match [PATH TO THE OBJECT][A FUNCTION]
 		def funcGen(ii):
-			ii[-1].cfunc="FN_"+("_".join([str(iii.name) for iii in ii]))
 			to_ret=""
 			to_ret+=("def_dyn_fn(FN_"+
 				("_".join([str(iii.name) for iii in ii]))+
@@ -1305,6 +1304,10 @@ class declGen():
 					to_ret+='\tstruct dyn_str* '+str(j.var)+'=get_arg('+str(iii)+');\n'
 			to_ret+=ii[-1].code.C()+"\n}\n\n"
 			return to_ret
+		#We're not generating anything for functions in functions... Deal with that
+		#Have this setup to divide between functions in objects, top level functions and functions in functions
+		for i in self.names:
+			i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
@@ -1316,7 +1319,7 @@ class declGen():
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(i[-1].new[-1].minLen())+','+str(i[-1].new[-1].maxLen())+',protect({"self"'+(''.join([',"'+str(ii.var)+'"' for ii in i[-1].new[-1].param]))+'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(ii.type.C())+")->type_to_create") if ii.type else ",TYPE" for ii in i[-1].new[-1].param]))+'}));\n\t#endif\n\tobject_setup('+i[-1].enum+');\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinherit_setup();\n'+i[-1].new[-1].code.C()+'\n}\n'
 				else:
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\tstruct dyn_obj *self = call_method(*type_parent_list[self->cur_type],"new",args);\n\tself->cur_type = '+i[-1].enum+';\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinit_methods(self,type_method_lists[self->cur_type]);\n\treturn self;\n}\n'
-			elif isinstance(i[-1],funcStatement) and len(i)==1 and i[-1].name.name!="new": #Top level global functions
+			elif (isinstance(i[-1],funcStatement) and len(i)==1) or (len(i)>1 and isinstance(i[-1],funcStatement) and isinstance(i[-2],funcStatement)): #Top level global functions
 				to_ret+=funcGen(i)
 		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=global;\n"
 		for i in self.names:
