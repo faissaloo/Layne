@@ -657,6 +657,7 @@ class whileStatement(inheritContextStatement):
 
 class objStatement(newContextStatement):
 	def __init__(self,name,code,parent=None):
+		self.localvars=[]
 		self.name=name
 		self.code=code
 		self.parent=parent
@@ -717,6 +718,7 @@ class funcParam():
 
 class funcStatement(newContextStatement):
 	def __init__(self,prototype,code):
+		self.localvars=[]
 		self.prototype=prototype
 		self.name=self.prototype.name
 		self.code=code
@@ -1182,9 +1184,13 @@ class declGen():
 		#This name list should seperate the actual object and its parents
 		#We've changed this so it generates the function declarations and object declarations using one object with different methods
 		self.names=[]
-		if isinstance(syntree,blockExpr) or isinstance(syntree,ast):
+		if isinstance(syntree,equalOp):
+			self.names.append(context+[syntree.operand1])
+		elif isinstance(syntree,blockExpr) or isinstance(syntree,ast):
 			for i in syntree.tree:
-				if isinstance(i,objStatement):
+				if isinstance(i,equalOp):
+					self.names.append(context+[i.operand1])
+				elif isinstance(i,objStatement):
 					self.names.append(context+[i])
 					self.names.extend(declGen(i.code,context+[i]))
 				elif isinstance(i,funcStatement):
@@ -1265,10 +1271,18 @@ class declGen():
 							i[-1].methods.append(ii)
 				if not i[-1].new:
 					to_ret+="decl_dyn_fn(FN_"+i[-1].fullname+"_new);\n"
+		declared_vars={}
 		#Backwards declarations
 		for i in self.names:
 			if isinstance(i[-1],funcStatement):
 				to_ret+='decl_dyn_fn(FN_'+("_".join([str(ii.name) for ii in i]))+');\n'
+			elif isinstance(i[-1],variable):
+				if ".".join([str(ii.name) for ii in i]) not in declared_vars:
+					if len(i)==1:
+						to_ret+='struct dyn_obj *'+i[-1].C()
+					else:
+						i[-2].localvars.append(i[-1])
+					declared_vars[".".join([str(ii.name) for ii in i])]=True
 
 		#Method lists
 		for i in self.names:
@@ -1307,11 +1321,13 @@ class declGen():
 					to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args->filled>='+str(iii+1)+'?get_arg('+str(iii+1)+'):'+j.default.C()+';\n'
 				else:
 					to_ret+='\tstruct dyn_obj* '+str(j.var)+'=get_arg('+str(iii+1)+');\n'
+			to_ret+="".join(["struct dyn_obj *"+iii.C()+";\n" for iii in ii[-1].localvars])
 			to_ret+=ii[-1].code.C()+"\n}\n\n"
 			return to_ret
 
 		for i in self.names:
-			i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
+			if isinstance(i[-1],funcStatement):
+				i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
