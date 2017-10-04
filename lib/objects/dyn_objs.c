@@ -246,6 +246,10 @@ void reg_destructor(struct dyn_obj *obj)
 
 bool is_child(struct dyn_obj *obj,enum type type_id)
 {
+	if (type_id==TYPE)
+	{
+		return true;
+	}
 	//Descend through the linked list of parents until we reach the TYPE object or a match
 	for (struct dyn_obj *i=obj;!(i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==TYPE);i=get_member(i,"parent"))
 	{

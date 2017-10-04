@@ -276,7 +276,7 @@ def_dyn_fn(int_xor)
 def_dyn_fn(int_neg)
 {
 	#ifdef DEBUG
-		arg_guard(2,2,protect({"self"}),protect({INT}));
+		arg_guard(1,1,protect({"self"}),protect({INT}));
 	#endif
 
 	return create_int(-get_int_val(SELF));
