@@ -543,7 +543,10 @@ class equalOp(dyadicOp):
 		if self.isCmp:
 			return 'call_method('+self.operand1.C()+',"eq",dyn_array_from(1,(void *[]){'+self.operand2.C()+'}))'
 		elif self.isAssign:
-			if isinstance(self.operand1,dotOp):
+			#Do something different if the thing we're assigning to is an item in a list
+			if isinstance(self.operand1,arrayIndex):
+				return 'call_method('+self.operand1.lstExpr.C()+',"set",dyn_array_from('+str(len(self.operand1.brackExpr)+1)+',(void *[]){'+(",".join([i.C() for i in self.operand1.brackExpr])) +","+self.operand2.C()+'}))'
+			elif isinstance(self.operand1,dotOp):
 				return 'bind_member('+self.operand1.operand1.C()+',"'+self.operand1.operand2.C()+'",'+self.operand2.C()+')'
 			else:
 				return self.operand1.C()+'='+self.operand2.C()
@@ -565,12 +568,27 @@ class parenthExpr():
 		else:
 			return "()"
 
-class brackExpr():
+class brackExpr(list):
 	def __init__(self,tree):
-		if len(parenthTok)>0:
-			self.tree=parenthTok[0]
+		super(type(self), self).__init__()
+		if len(tree)>0:
+			self.tree=tree[0]
+			print(self.tree)
 		else:
 			self.tree=None
+
+		current=self.tree
+		while isinstance(current,commaOp) or isinstance(current,equalOp):
+			if not isinstance(current,commaOp):
+				break
+			#We need to extract variable names from current
+			#Maybe we should make functions to traverse trees and extract items of a given type
+			self.insert(0,current.operand2)
+			current=current.operand1
+		#Fix for empty parameters, make less hacky later
+		if current!=tree:
+			self.insert(0,current)
+
 	def __repr__(self):
 		return str(self.tree)
 
@@ -874,7 +892,7 @@ def parseLayer(tokens,noAssign=False):
 
 	#Array indexing
 	for i in tree:
-		if (not tree.isUnary()) and isinstance(tree[tree.cursor],brackTok):
+		if (not tree.isUnary()) and isinstance(tree[tree.cursor],brackExpr):
 			tree.tree.insert(tree.cursor,arrayIndex(tree[tree.cursor-1],tree[tree.cursor]))
 			tree.tree.pop(tree.cursor-1)
 			tree.tree.pop(tree.cursor)
