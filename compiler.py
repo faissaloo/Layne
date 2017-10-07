@@ -1235,6 +1235,8 @@ class declGen():
 		elif isinstance(syntree,inheritContextStatement):
 			self.names.extend(declGen(syntree.code,context))
 
+		self.objNames=[i for i in self.names if isinstance(i[-1],objStatement)]
+
 	def __getitem__(self,a):
 		return self.names[a]
 
@@ -1274,13 +1276,13 @@ class declGen():
 		return to_ret
 
 	def genObjMethodListRefs(self):
-		if self.names:
+		if self.objNames:
 			return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
 		else:
 			return ""
 
 	def genObjFactoryMethodListRefs(self):
-		if self.names:
+		if self.objNames:
 			return '\t,\n\t&'+(',\n\t&'.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
 		else:
 			return ""
@@ -1375,8 +1377,11 @@ class declGen():
 		return to_ret
 
 	def genObjSizes(self):
-		#The objects with parents are going to have their sizes changed at runtime when their factory objects are created
-		return "\t,\n\t"+",\n\t".join(["sizeof(struct type_obj)" for i in self.names if isinstance(i[-1],objStatement)])
+		if self.objNames:
+			#The objects with parents are going to have their sizes changed at runtime when their factory objects are created
+			return "\t,\n\t"+",\n\t".join(["sizeof(struct type_obj)" for i in self.names if isinstance(i[-1],objStatement)])
+		else:
+			return ""
 #print(parsedSource)
 d=declGen(parsedSource)
 with open("lib/parserdata/obj_enums.txt","w") as f:
