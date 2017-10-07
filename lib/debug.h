@@ -75,7 +75,7 @@
 			{\
 				if (!is_child(get_arg(current_argument_i),argument_type_array[current_argument_i]))\
 				{\
-					error(1,"%s (argument %li) is not an instance of %s, got %s",argument_names_array[current_argument_i],current_argument_i,type_names[argument_type_array[current_argument_i]],type_names[((struct dyn_obj*)SELF)->cur_type]);\
+					error(1,"%s (argument %li) is not an instance of %s, got %s",argument_names_array[current_argument_i],current_argument_i,type_names[argument_type_array[current_argument_i]],type_names[((struct dyn_obj*)get_arg(current_argument_i))->cur_type]);\
 				}\
 			}\
 		}
