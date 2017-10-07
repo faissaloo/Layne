@@ -33,7 +33,6 @@ struct array_obj
 extern struct method_list array_methods;
 extern struct method_list factory_array_methods;
 decl_dyn_fn(array_new);
-decl_dyn_fn(array_cut);
 decl_dyn_fn(array_set);
 decl_dyn_fn(array_ins);
 decl_dyn_fn(array_del);

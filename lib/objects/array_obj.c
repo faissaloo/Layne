@@ -27,10 +27,9 @@
 #include "none_obj.h"
 
 struct method_list factory_array_methods={
-	6,
+	5,
 	{
 		{"new",factory_array_new},
-		{"cut",factory_array_cut},
 		{"set",factory_array_set},
 		{"get",factory_array_get},
 		{"ins",factory_array_ins},
@@ -39,10 +38,9 @@ struct method_list factory_array_methods={
 };
 
 struct method_list array_methods={
-	6,
+	5,
 	{
 		{"new",array_new},
-		{"cut",array_cut},
 		{"set",array_set},
 		{"get",array_get},
 		{"ins",array_ins},
@@ -66,11 +64,6 @@ def_dyn_fn(array_new)
 		return call_method(get_arg(1),"array",dyn_array_create());
 	}
 	return create_array(NULL);
-}
-
-def_dyn_fn(array_cut)
-{
-	return create_array(dyn_array_cut(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)),get_int_val(get_arg(2))));
 }
 
 //Compares every item in the array
@@ -103,7 +96,14 @@ def_dyn_fn(array_set)
 //Array[x]
 def_dyn_fn(array_get)
 {
-	return (struct dyn_obj*)dyn_array_get(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)));
+	if (args->filled==2)
+	{
+		return (struct dyn_obj*)dyn_array_get(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)));
+	}
+	else
+	{
+		return create_array(dyn_array_cut(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)),get_int_val(get_arg(2))));
+	}
 }
 
 def_dyn_fn(array_ins)
