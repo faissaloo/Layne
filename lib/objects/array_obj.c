@@ -27,24 +27,26 @@
 #include "none_obj.h"
 
 struct method_list factory_array_methods={
-	5,
+	6,
 	{
 		{"new",factory_array_new},
 		{"set",factory_array_set},
 		{"get",factory_array_get},
 		{"ins",factory_array_ins},
-		{"del",array_del}
+		{"del",factory_array_del},
+		{"len",factory_array_len}
 	}
 };
 
 struct method_list array_methods={
-	5,
+	6,
 	{
 		{"new",array_new},
 		{"set",array_set},
 		{"get",array_get},
 		{"ins",array_ins},
-		{"del",array_del}
+		{"del",array_del},
+		{"len",array_len}
 	}
 };
 
@@ -116,4 +118,9 @@ def_dyn_fn(array_del)
 {
 	dyn_array_remove(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)));
 	return create_none();
+}
+
+def_dyn_fn(array_len)
+{
+	return create_int(((struct array_obj*)SELF)->data->filled);
 }
