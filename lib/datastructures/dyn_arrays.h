@@ -32,5 +32,6 @@ void dyn_array_insert(struct dyn_array *self, signed int index, void *data);
 void dyn_array_remove(struct dyn_array *self, signed int index);
 void *dyn_array_get(struct dyn_array *self, signed int index);
 void dyn_array_set(struct dyn_array *self, signed int index,void *data);
+struct dyn_array* dyn_array_copy(struct dyn_array *self);
 struct dyn_array* dyn_array_cut(struct dyn_array *self, int start, int end);
 #endif

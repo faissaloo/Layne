@@ -35,7 +35,7 @@ struct dyn_array* dyn_array_from(size_t count,void *initial[])
 {
 	struct dyn_array *new_dyn_array=GC_MALLOC(sizeof(struct dyn_array));
 	new_dyn_array->filled=count;
-	new_dyn_array->length=((count/block_size)*block_size);
+	new_dyn_array->length=(((count/block_size)+1)*block_size);
 	new_dyn_array->items=GC_MALLOC(sizeof(void*)*new_dyn_array->length);
 	memcpy(*new_dyn_array->items,initial,new_dyn_array->filled*sizeof(void*));
 	return new_dyn_array;
@@ -143,10 +143,23 @@ struct dyn_array* dyn_array_cut(struct dyn_array *self, int start, int end)
 		end=self->filled-end;
 	}
 	new_array->filled=end-start;
-	new_array->length=(((new_array->filled)/block_size)*block_size);
+	new_array->length=((((new_array->filled)/block_size)+1)*block_size);
 	new_array->items=GC_MALLOC(sizeof(void*)*new_array->length);
 
-	memcpy(*new_array->items,(*new_array->items)+(sizeof(void*)*start),new_array->filled*sizeof(void*));
+	memcpy(*new_array->items,(*self->items)+(sizeof(void*)*start),new_array->filled*sizeof(void*));
+
+	return new_array;
+}
+
+struct dyn_array* dyn_array_copy(struct dyn_array *self)
+{
+	struct dyn_array *new_array;
+	new_array=dyn_array_create();
+	new_array->filled=self->filled;
+	new_array->length=((((new_array->filled)/block_size)+1)*block_size);
+	new_array->items=GC_MALLOC(sizeof(void*)*new_array->length);
+
+	memcpy(*new_array->items,(*self->items),new_array->filled*sizeof(void*));
 
 	return new_array;
 }

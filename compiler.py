@@ -619,6 +619,12 @@ class arrayIndex():
 		self.lstExpr=lstExpr
 		self.brackExpr=brackExpr
 
+	def __repr__(self):
+		return str(self.lstExpr)+"["+str(self.brackExpr)+"]"
+
+	def C(self):
+		return 'call_method('+self.lstExpr.C()+',"get",dyn_array_from('+str(len(self.brackExpr)+1)+',(void *[]){'+(",".join([i.C() for i in self.brackExpr])) +'}))'
+
 class funcCall():
 	def __init__(self,name,parenthExpr):
 		self.name=name
@@ -1299,7 +1305,7 @@ class declGen():
 			elif isinstance(i[-1],variable):
 				if ".".join([str(ii.name) for ii in i]) not in declared_vars:
 					if len(i)==1:
-						to_ret+='struct dyn_obj *'+i[-1].C()
+						to_ret+='struct dyn_obj *'+i[-1].C()+";"
 					else:
 						i[-2].localvars.append(i[-1])
 					declared_vars[".".join([str(ii.name) for ii in i])]=True

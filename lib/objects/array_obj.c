@@ -54,7 +54,7 @@ struct dyn_obj* create_array(struct dyn_array *ary)
 {
 	object_setup(ARRAY);
 	init_methods(self,&array_methods);
-
+	((struct array_obj*)self)->data=ary;
 	bind_member(self,"parent",type_factory);
 	return self;
 }
