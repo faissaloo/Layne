@@ -573,7 +573,6 @@ class brackExpr(list):
 		super(type(self), self).__init__()
 		if len(tree)>0:
 			self.tree=tree[0]
-			print(self.tree)
 		else:
 			self.tree=None
 
@@ -591,6 +590,9 @@ class brackExpr(list):
 
 	def __repr__(self):
 		return str(self.tree)
+
+	def C(self):
+		return 'create_array(dyn_array_from('+str(len(self)+1)+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
 
 class blockExpr(list):
 	def __init__(self,tree):
@@ -1277,7 +1279,7 @@ class declGen():
 		else:
 			return ""
 	def genMain(self):
-		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "debug.h"\n'
+		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "array_obj.h"\n#include "debug.h"\n'
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
 				has_new=False
