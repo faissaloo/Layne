@@ -592,7 +592,7 @@ class brackExpr(list):
 		return str(self.tree)
 
 	def C(self):
-		return 'create_array(dyn_array_from('+str(len(self)+1)+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
+		return 'create_array(dyn_array_from('+str(len(self))+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
 
 class blockExpr(list):
 	def __init__(self,tree):
@@ -623,7 +623,7 @@ class arrayIndex():
 		return str(self.lstExpr)+"["+str(self.brackExpr)+"]"
 
 	def C(self):
-		return 'call_method('+self.lstExpr.C()+',"get",dyn_array_from('+str(len(self.brackExpr)+1)+',(void *[]){'+(",".join([i.C() for i in self.brackExpr])) +'}))'
+		return 'call_method('+self.lstExpr.C()+',"get",dyn_array_from('+str(len(self.brackExpr))+',(void *[]){'+(",".join([i.C() for i in self.brackExpr])) +'}))'
 
 class funcCall():
 	def __init__(self,name,parenthExpr):
