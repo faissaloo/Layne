@@ -897,20 +897,18 @@ def parseLayer(tokens,noAssign=False):
 			if i[0]=="mdop":
 				if i[1]==".":
 					tree.consumeDyadic(dotOp)
-
-	#Array indexing
-	for i in tree:
-		if (not tree.isUnary()) and isinstance(tree[tree.cursor],brackExpr):
+		#Array indexing
+		elif (not tree.isUnary()) and isinstance(tree[tree.cursor],brackExpr):
 			tree.tree.insert(tree.cursor,arrayIndex(tree[tree.cursor-1],tree[tree.cursor]))
 			tree.tree.pop(tree.cursor-1)
 			tree.tree.pop(tree.cursor)
-
-	#Function calls
-	for i in tree:
-		if (not tree.isUnary()) and isinstance(tree[tree.cursor],parenthExpr):
+			tree.cursor-=1
+		#Function calls
+		elif (not tree.isUnary()) and isinstance(tree[tree.cursor],parenthExpr):
 			tree.tree.insert(tree.cursor,funcCall(tree[tree.cursor-1],tree[tree.cursor]))
 			tree.tree.pop(tree.cursor-1)
 			tree.tree.pop(tree.cursor)
+			tree.cursor-=1
 
 	for i in tree:
 		if type(i) is tuple:
