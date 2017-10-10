@@ -24,10 +24,11 @@
 #include "factory_obj.h"
 
 struct method_list factory_str_methods={
-	8,
+	9,
 	{
 		{"new",factory_str_new},
 		{"add",factory_str_add},
+		{"iadd",factory_str_iadd},
 		{"cut",factory_str_cut},
 		{"hash",factory_str_hash},
 		{"int",factory_str_int},
@@ -52,10 +53,11 @@ struct dyn_str* get_str_val(struct dyn_obj *obj)
 }
 
 struct method_list str_methods={
-	8,
+	9,
 	{
 		{"new",str_new},
 		{"add",str_add},
+		{"iadd",str_iadd},
 		{"cut",str_cut},
 		{"hash",str_hash},
 		{"int",str_int},
@@ -102,6 +104,12 @@ def_dyn_fn(str_add)
 	new_str=create_str(get_str_val(SELF));
 	dyn_str_cat(get_str_val(new_str),get_str_val(get_arg(1)));
 	return new_str;
+}
+
+def_dyn_fn(str_iadd)
+{
+	dyn_str_cat(get_str_val(SELF),get_str_val(get_arg(1)));
+	return SELF;
 }
 
 def_dyn_fn(str_get)

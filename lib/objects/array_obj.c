@@ -27,26 +27,28 @@
 #include "none_obj.h"
 
 struct method_list factory_array_methods={
-	6,
+	7,
 	{
 		{"new",factory_array_new},
 		{"set",factory_array_set},
 		{"get",factory_array_get},
 		{"ins",factory_array_ins},
 		{"del",factory_array_del},
-		{"len",factory_array_len}
+		{"len",factory_array_len},
+		{"str",factory_array_str}
 	}
 };
 
 struct method_list array_methods={
-	6,
+	7,
 	{
 		{"new",array_new},
 		{"set",array_set},
 		{"get",array_get},
 		{"ins",array_ins},
 		{"del",array_del},
-		{"len",array_len}
+		{"len",array_len},
+		{"str",array_str}
 	}
 };
 
@@ -123,4 +125,24 @@ def_dyn_fn(array_del)
 def_dyn_fn(array_len)
 {
 	return create_int(((struct array_obj*)SELF)->data->filled);
+}
+
+def_dyn_fn(array_str)
+{
+	struct dyn_str *new_str;
+	new_str=dyn_str_from_cstr("[");
+
+	if (((struct array_obj*)SELF)->data->filled>=1)
+	{
+		dyn_str_cat(new_str,get_str_val(call_method_noargs(dyn_array_get(((struct array_obj*)SELF)->data,0),"str")));
+	}
+
+	for (iter_t i=1;i<((struct array_obj*)SELF)->data->filled;i++)
+	{
+		dyn_str_cat_cstr(new_str,",");
+		dyn_str_cat(new_str,get_str_val(call_method_noargs(dyn_array_get(((struct array_obj*)SELF)->data,i),"str")));
+	}
+
+	dyn_str_cat_cstr(new_str,"]");
+	return create_str(new_str);
 }

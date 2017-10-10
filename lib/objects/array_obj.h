@@ -39,4 +39,5 @@ decl_dyn_fn(array_del);
 decl_dyn_fn(array_get);
 decl_dyn_fn(array_len);
 decl_dyn_fn(array_eq);
+decl_dyn_fn(array_str);
 #endif

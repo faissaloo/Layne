@@ -36,6 +36,7 @@ extern struct method_list str_methods;
 extern struct method_list factory_str_methods;
 decl_dyn_fn(str_new);
 decl_dyn_fn(str_add);
+decl_dyn_fn(str_iadd);
 decl_dyn_fn(str_cut);
 decl_dyn_fn(str_hash);
 decl_dyn_fn(str_int);
