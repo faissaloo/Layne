@@ -27,7 +27,7 @@
 #include "none_obj.h"
 
 struct method_list factory_array_methods={
-	7,
+	8,
 	{
 		{"new",factory_array_new},
 		{"set",factory_array_set},
@@ -35,12 +35,13 @@ struct method_list factory_array_methods={
 		{"ins",factory_array_ins},
 		{"del",factory_array_del},
 		{"len",factory_array_len},
-		{"str",factory_array_str}
+		{"str",factory_array_str},
+		{"hash",factory_array_hash}
 	}
 };
 
 struct method_list array_methods={
-	7,
+	8,
 	{
 		{"new",array_new},
 		{"set",array_set},
@@ -48,7 +49,8 @@ struct method_list array_methods={
 		{"ins",array_ins},
 		{"del",array_del},
 		{"len",array_len},
-		{"str",array_str}
+		{"str",array_str},
+		{"hash",array_hash}
 	}
 };
 
@@ -145,4 +147,16 @@ def_dyn_fn(array_str)
 
 	dyn_str_cat_cstr(new_str,"]");
 	return create_str(new_str);
+}
+
+def_dyn_fn(array_hash)
+{
+	hash_t hash;
+	hash=0;
+	for (iter_t i=0;i<((struct array_obj*)SELF)->data->filled;i++)
+	{
+		hash*=31;
+		hash+=get_int_val(call_method_noargs(dyn_array_get(((struct array_obj*)SELF)->data,i),"hash"));
+	}
+	return create_int(hash);
 }
