@@ -953,21 +953,15 @@ def parseLayer(tokens,noAssign=False):
 		if type(i) is tuple:
 			if i[0]=="uaiop":
 				if i[1]=="$+": #Should I just remove this one? It doesn't do anything
-					if tree.isUnary():
-						tree.consumeUnary(iPosAssign)
-					#else:
-					#	print(type(tree[tree.cursor-1]) is tuple)
+					tree.consumeUnary(iPosAssign)
 
 				elif i[1]=="$-":
-					if tree.isUnary():
-						tree.consumeUnary(iNegAssign)
+					tree.consumeUnary(iNegAssign)
 
 				elif i[1]=="$~":
-					if tree.isUnary():
-						tree.consumeUnary(iBitNotAssign)
+					tree.consumeUnary(iBitNotAssign)
 				elif i[1]=="$!":
-					if tree.isUnary():
-						tree.consumeUnary(iNotAssign)
+					tree.consumeUnary(iNotAssign)
 
 
 			elif i[0]=="udop":
