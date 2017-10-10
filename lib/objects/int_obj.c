@@ -29,13 +29,17 @@
 struct dyn_obj *global;
 
 struct method_list factory_int_methods={
-	18,
+	30,
 	{
 		{"new",factory_int_new},
 		{"add",factory_int_add},
+		{"iadd",factory_int_iadd},
 		{"sub",factory_int_sub},
+		{"isub",factory_int_isub},
 		{"mul",factory_int_mul},
+		{"imul",factory_int_imul},
 		{"div",factory_int_div},
+		{"idiv",factory_int_idiv},
 		{"int",factory_int_int},
 		{"str",factory_int_str},
 		{"hash",factory_int_hash},
@@ -46,9 +50,17 @@ struct method_list factory_int_methods={
 		{"gt",factory_int_gt},
 		{"ge",factory_int_ge},
 		{"or",factory_int_or},
+		{"ior",factory_int_ior},
 		{"and",factory_int_and},
+		{"iand",factory_int_iand},
 		{"xor",factory_int_xor},
-		{"neg",factory_int_neg}
+		{"ixor",factory_int_ixor},
+		{"neg",factory_int_neg},
+		{"ineg",factory_int_ineg},
+		{"not",factory_int_not},
+		{"inot",factory_int_inot},
+		{"mod",factory_int_mod},
+		{"imod",factory_int_imod}
 	}
 };
 struct dyn_obj *create_int_factory()
@@ -68,13 +80,17 @@ int get_int_val(struct dyn_obj *obj)
 }
 
 struct method_list int_methods={
-	18,
+	30,
 	{
 		{"new",int_new},
 		{"add",int_add},
+		{"iadd",int_iadd},
 		{"sub",int_sub},
+		{"isub",int_isub},
 		{"mul",int_mul},
+		{"imul",int_imul},
 		{"div",int_div},
+		{"idiv",int_idiv},
 		{"int",int_int},
 		{"str",int_str},
 		{"hash",int_hash},
@@ -85,9 +101,17 @@ struct method_list int_methods={
 		{"gt",int_gt},
 		{"ge",int_ge},
 		{"or",int_or},
+		{"ior",int_ior},
 		{"and",int_and},
+		{"iand",int_iand},
 		{"xor",int_xor},
-		{"neg",int_neg}
+		{"ixor",int_ixor},
+		{"neg",int_neg},
+		{"ineg",int_ineg},
+		{"not",int_not},
+		{"inot",int_inot},
+		{"mod",int_mod},
+		{"imod",int_imod}
 	}
 };
 
@@ -163,6 +187,17 @@ def_dyn_fn(int_add) //add(self,x)
 	return create_int(get_int_val(SELF)+get_int_val(get_arg(1)));
 }
 
+def_dyn_fn(int_iadd)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self+=operand
+	((struct int_obj*)SELF)->value+=get_int_val(get_arg(1));
+	return SELF;
+}
+
 def_dyn_fn(int_sub) //sub(self,operand)
 {
 	#ifdef DEBUG
@@ -171,6 +206,17 @@ def_dyn_fn(int_sub) //sub(self,operand)
 
 	//int(self+operand)
 	return create_int(get_int_val(SELF)-get_int_val(get_arg(1)));
+}
+
+def_dyn_fn(int_isub)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self-=operand
+	((struct int_obj*)SELF)->value-=get_int_val(get_arg(1));
+	return SELF;
 }
 
 def_dyn_fn(int_mul) //mul(self,operand)
@@ -182,6 +228,17 @@ def_dyn_fn(int_mul) //mul(self,operand)
 	return create_int(get_int_val(SELF)*get_int_val(get_arg(1)));
 }
 
+def_dyn_fn(int_imul)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self*=operand
+	((struct int_obj*)SELF)->value*=get_int_val(get_arg(1));
+	return SELF;
+}
+
 def_dyn_fn(int_div) //div(self,operand)
 {
 	#ifdef DEBUG
@@ -190,6 +247,38 @@ def_dyn_fn(int_div) //div(self,operand)
 
 	//int(self/operand)
 	return create_int(get_int_val(SELF)/get_int_val(get_arg(1)));
+}
+
+def_dyn_fn(int_idiv)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self/=operand
+	((struct int_obj*)SELF)->value/=get_int_val(get_arg(1));
+	return SELF;
+}
+
+def_dyn_fn(int_mod) //div(self,operand)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//int(self%operand)
+	return create_int(get_int_val(SELF)%get_int_val(get_arg(1)));
+}
+
+def_dyn_fn(int_imod)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self%=operand
+	((struct int_obj*)SELF)->value%=get_int_val(get_arg(1));
+	return SELF;
 }
 
 def_dyn_fn(int_hash)
@@ -255,6 +344,17 @@ def_dyn_fn(int_and)
 	return create_int(get_int_val(SELF)&get_int_val(get_arg(1)));
 }
 
+def_dyn_fn(int_iand)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self&=operand
+	((struct int_obj*)SELF)->value&=get_int_val(get_arg(1));
+	return SELF;
+}
+
 def_dyn_fn(int_or)
 {
 	#ifdef DEBUG
@@ -262,6 +362,17 @@ def_dyn_fn(int_or)
 	#endif
 
 	return create_int(get_int_val(SELF)|get_int_val(get_arg(1)));
+}
+
+def_dyn_fn(int_ior)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self|=operand
+	((struct int_obj*)SELF)->value|=get_int_val(get_arg(1));
+	return SELF;
 }
 
 def_dyn_fn(int_xor)
@@ -273,6 +384,17 @@ def_dyn_fn(int_xor)
 	return create_int(get_int_val(SELF)^get_int_val(get_arg(1)));
 }
 
+def_dyn_fn(int_ixor)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
+	#endif
+
+	//self^=operand
+	((struct int_obj*)SELF)->value^=get_int_val(get_arg(1));
+	return SELF;
+}
+
 def_dyn_fn(int_neg)
 {
 	#ifdef DEBUG
@@ -280,4 +402,35 @@ def_dyn_fn(int_neg)
 	#endif
 
 	return create_int(-get_int_val(SELF));
+}
+
+def_dyn_fn(int_ineg)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({INT}));
+	#endif
+
+	//self=-self
+	((struct int_obj*)SELF)->value=-((struct int_obj*)SELF)->value;
+	return SELF;
+}
+
+def_dyn_fn(int_not)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({INT}));
+	#endif
+
+	return create_int(~get_int_val(SELF));
+}
+
+def_dyn_fn(int_inot)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({INT}));
+	#endif
+
+	//self=-self
+	((struct int_obj*)SELF)->value=~((struct int_obj*)SELF)->value;
+	return SELF;
 }

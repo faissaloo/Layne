@@ -40,9 +40,15 @@ decl_dyn_fn(int_str);
 decl_dyn_fn(int_bool);
 
 decl_dyn_fn(int_add);
+decl_dyn_fn(int_iadd);
 decl_dyn_fn(int_sub);
+decl_dyn_fn(int_isub);
 decl_dyn_fn(int_mul);
+decl_dyn_fn(int_imul);
 decl_dyn_fn(int_div);
+decl_dyn_fn(int_idiv);
+decl_dyn_fn(int_mod);
+decl_dyn_fn(int_imod);
 
 decl_dyn_fn(int_eq);
 decl_dyn_fn(int_lt);
@@ -51,11 +57,17 @@ decl_dyn_fn(int_gt);
 decl_dyn_fn(int_ge);
 
 decl_dyn_fn(int_or);
+decl_dyn_fn(int_ior);
 decl_dyn_fn(int_and);
+decl_dyn_fn(int_iand);
 decl_dyn_fn(int_xor);
+decl_dyn_fn(int_ixor);
 
 decl_dyn_fn(int_copy);
 decl_dyn_fn(int_hash);
 
 decl_dyn_fn(int_neg);
+decl_dyn_fn(int_ineg);
+decl_dyn_fn(int_not);
+decl_dyn_fn(int_inot);
 #endif
