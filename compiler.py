@@ -1405,4 +1405,4 @@ with open("lib/parserdata/main.h","w") as f:
 	f.write(d.genHeader())
 with open("lib/parserdata/main.c","w") as f:
 	f.write(d.genMain())
-os.system("sh -c 'cd lib;make clean;make'")
+os.system("sh -c 'cd lib;make dbg'")

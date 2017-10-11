@@ -8,7 +8,7 @@ all: Makefile parserdata/main.o utils.o debug.o objects/factory_obj.o objects/gl
 dbg: CFLAGS+=-DDEBUG -g -Og -rdynamic
 dbg: all
 
-parserdata/main.o: parserdata/main.c parserdata/main.h parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_factory_method_list_refs.txt parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_names.txt
+parserdata/main.o: parserdata/main.c parserdata/main.h parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_factory_method_list_refs.txt parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_names.txt parserdata/obj_method_list_refs.txt
 	$(CC) $(CFLAGS) -c parserdata/main.c -o parserdata/main.o
 
 debug.o: debug.c debug.h
