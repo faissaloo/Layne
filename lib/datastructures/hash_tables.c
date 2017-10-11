@@ -62,6 +62,16 @@ struct hash_table* hash_table_create(int (*cmp_func)(void *,void *),hash_t (*has
 	return self;
 }
 
+struct hash_table* hash_table_from(int (*cmp_func)(void *,void *), hash_t (*hash_func)(void *), size_t count, struct ht_item_init initial[])
+{
+	struct hash_table *self=hash_table_create(cmp_func,hash_func);
+	for (iter_t i=0;i<count;i++)
+	{
+		hash_table_add(self,initial[i].data,initial[i].key);
+	}
+	return self;
+}
+
 void hash_table_grow(struct hash_table *self)
 {
 	struct dyn_array *(*old_items)[]=self->items;

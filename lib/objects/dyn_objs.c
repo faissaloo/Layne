@@ -33,6 +33,7 @@
 #include "bool_obj.h"
 #include "str_obj.h"
 #include "array_obj.h"
+#include "dict_obj.h"
 #include "func_obj.h"
 #include "factory_obj.h"
 #include "main.h"
@@ -63,7 +64,7 @@ size_t type_sizes[]={
 	sizeof(struct bool_obj),
 	sizeof(struct str_obj),
 	sizeof(struct array_obj),
-	0 //Unimplemented (dict)
+	sizeof(struct dict_obj),
 	#include "obj_sizes.txt"
 };
 
@@ -80,7 +81,7 @@ struct method_list *type_method_lists[]={
 	&bool_methods,
 	&str_methods,
 	&array_methods,
-	NULL //Unimplemented (dict)
+	&dict_methods
 	#include "obj_method_list_refs.txt"
 };
 
@@ -95,7 +96,7 @@ struct method_list *type_factory_method_lists[]={
 	&factory_bool_methods,
 	&factory_str_methods,
 	&factory_array_methods,
-	NULL //Unimplemented (dict)
+	&factory_dict_methods
 	#include "obj_factory_method_list_refs.txt"
 };
 
@@ -123,7 +124,7 @@ struct dyn_obj **type_parent_list[]={
 	&type_factory, //Bool
 	&type_factory, //Str
 	&type_factory, //Array
-	&type_factory //Dict
+	&type_factory, //Dict
 	#include "obj_type_parent_refs.txt"
 };
 

@@ -425,6 +425,13 @@ class iBitNotAssign(unaryAssignment):
 class assignment(dyadicOp):
 	pass
 
+class dictItemOp(dyadicOp):
+	def __repr__(self):
+		return "("+str(self.operand1)+":"+str(self.operand2)+")"
+
+	def C(self):
+		return "{"+self.operand1.C()+","+self.operand2.C()+"}"
+
 class copyAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" @= "+self.operand2.__repr__()+")"
@@ -592,7 +599,10 @@ class brackExpr(list):
 		return str(self.tree)
 
 	def C(self):
-		return 'create_array(dyn_array_from('+str(len(self))+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
+		if all(type(i) is dictItemOp for i in self):
+			return 'create_dict(dyn_obj_ht_from('+str(len(self))+',(struct ht_item_init[]){'+(','.join([i.C() for i in self]))+'}))'
+		else:
+			return 'create_array(dyn_array_from('+str(len(self))+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
 
 class blockExpr(list):
 	def __init__(self,tree):
@@ -1041,12 +1051,17 @@ def parseLayer(tokens,noAssign=False):
 						tree.consumeDyadic(bitRshAssign)
 					elif i[1]=="<<=":
 						tree.consumeDyadic(bitLshAssign)
-
+	for i in tree:
+		if type(i) is tuple:
+			if i[0]=="mdop":
+				if i[1]==":":
+					tree.consumeDyadic(dictItemOp)
 	for i in tree:
 		if type(i) is tuple:
 			if i[0]=="mdop":
 				if i[1]==",":
 					tree.consumeDyadic(commaOp)
+
 	for i in tree:
 		if type(i) is tuple:
 			if i[0]=="id":
@@ -1279,7 +1294,7 @@ class declGen():
 		else:
 			return ""
 	def genMain(self):
-		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "array_obj.h"\n#include "debug.h"\n'
+		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "array_obj.h"\n#include "dict_obj.h"\n#include "debug.h"\n'
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
 				has_new=False

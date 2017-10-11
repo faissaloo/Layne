@@ -21,6 +21,12 @@
 #include "dyn_arrays.h"
 #include "../utils.h"
 
+struct ht_item_init
+{
+	void *data;
+	void *key;
+};
+
 struct hash_table_item
 {
 	void *data;
@@ -46,6 +52,7 @@ hash_t hash_ptrs(void *in_ptr);
 int string_eq(void *a,void *b);
 hash_t hash_string(void *in_str);
 struct hash_table* hash_table_create(int (*cmp_func)(void *,void *),hash_t (*hash_func)(void *));
+struct hash_table* hash_table_from(int (*cmp_func)(void *,void *), hash_t (*hash_func)(void *), size_t count,struct ht_item_init initial[]);
 void hash_table_grow(struct hash_table *self);
 void hash_table_shrink(struct hash_table *self);
 void hash_table_remove(struct hash_table *self, void *key);
