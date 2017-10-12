@@ -1288,11 +1288,6 @@ class declGen():
 		else:
 			return ""
 
-	def genObjFactoryMethodListRefs(self):
-		if self.objNames:
-			return '\t,\n\t&'+(',\n\t&'.join(["factory_OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
-		else:
-			return ""
 	def genMain(self):
 		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "array_obj.h"\n#include "dict_obj.h"\n#include "debug.h"\n'
 		for i in self.names:
@@ -1326,14 +1321,7 @@ class declGen():
 				to_ret+="\t"+str(len(i[-1].methods)+1)+",\n\t{\n"
 				for ii in i[-1].methods:
 					to_ret+='\t\t{"'+str(ii[-1].name)+'",FN_'+("_".join([str(iii.name) for iii in ii]))+"},\n"
-				to_ret+='\t\t{"new",FN_'+i[-1].fullname+"_new},\n"
-				to_ret+="\t}\n};\n\n"
-
-				to_ret+="struct method_list factory_"+i[-1].enum+"_methods = {\n"
-				to_ret+="\t"+str(len(i[-1].methods)+1)+",\n\t{\n"
-				for ii in i[-1].methods:
-					to_ret+='\t\t{"'+str(ii[-1].name)+'",factory_FN_'+("_".join([str(iii.name) for iii in ii]))+"},\n"
-				to_ret+='\t\t{"new",factory_FN_'+i[-1].fullname+"_new},\n"
+				to_ret+='\t\tmethod("new",FN_'+i[-1].fullname+"_new),\n"
 				to_ret+="\t}\n};\n\n"
 
 		for i in self.names:
@@ -1399,8 +1387,6 @@ with open("lib/parserdata/obj_names.txt","w") as f:
 	f.write(d.genObjNames())
 with open("lib/parserdata/obj_method_list_refs.txt","w") as f:
 	f.write(d.genObjMethodListRefs())
-with open("lib/parserdata/obj_factory_method_list_refs.txt","w") as f:
-	f.write(d.genObjFactoryMethodListRefs())
 with open("lib/parserdata/main.h","w") as f:
 	f.write(d.genHeader())
 with open("lib/parserdata/main.c","w") as f:

@@ -23,27 +23,24 @@
 #include "bool_obj.h"
 #include "factory_obj.h"
 
-struct method_list factory_str_methods={
+struct method_list str_methods={
 	9,
 	{
-		{"new",factory_str_new},
-		{"add",factory_str_add},
-		{"iadd",factory_str_iadd},
-		{"cut",factory_str_cut},
-		{"hash",factory_str_hash},
-		{"int",factory_str_int},
-		{"str",factory_str_str},
-		{"get",factory_str_get},
-		{"eq",factory_str_eq}
+		method_pair("new",str_new),
+		method_pair("add",str_add),
+		method_pair("iadd",str_iadd),
+		method_pair("cut",str_cut),
+		method_pair("hash",str_hash),
+		method_pair("int",str_int),
+		method_pair("str",str_str),
+		method_pair("get",str_get),
+		method_pair("eq",str_eq)
 	}
 };
 
 struct dyn_obj *create_str_factory()
 {
-	object_setup(FACTORY);
-	init_methods(self,&factory_str_methods);
-
-	bind_member(self,"parent",type_factory);
+	factory_setup(STR);
 	return self;
 }
 
@@ -51,21 +48,6 @@ struct dyn_str* get_str_val(struct dyn_obj *obj)
 {
 	return ((struct str_obj*)obj)->data;
 }
-
-struct method_list str_methods={
-	9,
-	{
-		{"new",str_new},
-		{"add",str_add},
-		{"iadd",str_iadd},
-		{"cut",str_cut},
-		{"hash",str_hash},
-		{"int",str_int},
-		{"str",str_str},
-		{"get",str_get},
-		{"eq",str_eq}
-	}
-};
 
 struct dyn_obj* create_str(struct dyn_str *data)
 {

@@ -26,44 +26,24 @@
 #include <stdio.h>
 #include "debug.h"
 
-struct method_list factory_bool_methods={
-	9,
-	{
-		{"new",factory_bool_new},
-		{"bool",factory_bool_bool},
-		{"int",factory_bool_int},
-		{"str",factory_bool_str},
-		{"bor",factory_bool_or},
-		{"or",factory_bool_or},
-		{"band",factory_bool_and},
-		{"and",factory_bool_and},
-		{"xor",factory_bool_xor}
-	}
-};
-
 struct method_list bool_methods={
 	9,
 	{
-		{"new",bool_new},
-		{"bool",bool_bool},
-		{"int",bool_int},
-		{"str",bool_str},
-		{"bor",bool_or},
-		{"or",bool_or},
-		{"band",bool_and},
-		{"and",bool_and},
-		{"xor",bool_xor}
+		method_pair("new",bool_new),
+		method_pair("bool",bool_bool),
+		method_pair("int",bool_int),
+		method_pair("str",bool_str),
+		method_pair("bor",bool_or),
+		method_pair("or",bool_or),
+		method_pair("band",bool_and),
+		method_pair("and",bool_and),
+		method_pair("xor",bool_xor)
 	}
 };
 
 struct dyn_obj *create_bool_factory()
 {
-	object_setup(FACTORY);
-	((struct factory_obj*)self)->type_to_create=BOOL;
-
-	init_methods(self,&factory_bool_methods);
-
-	bind_member(self,"parent",type_factory);
+	factory_setup(BOOL);
 	return self;
 }
 

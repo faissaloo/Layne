@@ -26,31 +26,17 @@
 #include "factory_obj.h"
 #include "none_obj.h"
 
-struct method_list factory_array_methods={
-	8,
-	{
-		{"new",factory_array_new},
-		{"set",factory_array_set},
-		{"get",factory_array_get},
-		{"ins",factory_array_ins},
-		{"del",factory_array_del},
-		{"len",factory_array_len},
-		{"str",factory_array_str},
-		{"hash",factory_array_hash}
-	}
-};
-
 struct method_list array_methods={
 	8,
 	{
-		{"new",array_new},
-		{"set",array_set},
-		{"get",array_get},
-		{"ins",array_ins},
-		{"del",array_del},
-		{"len",array_len},
-		{"str",array_str},
-		{"hash",array_hash}
+		method_pair("new",array_new),
+		method_pair("set",array_set),
+		method_pair("get",array_get),
+		method_pair("ins",array_ins),
+		method_pair("del",array_del),
+		method_pair("len",array_len),
+		method_pair("str",array_str),
+		method_pair("hash",array_hash)
 	}
 };
 

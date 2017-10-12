@@ -25,21 +25,12 @@
 #include "factory_obj.h"
 #include "none_obj.h"
 
-struct method_list factory_dict_methods={
-	3,
-	{
-		{"new",factory_dict_new},
-		{"set",factory_dict_set},
-		{"get",factory_dict_get}
-	}
-};
-
 struct method_list dict_methods={
 	3,
 	{
-		{"new",dict_new},
-		{"set",dict_set},
-		{"get",dict_get}
+		method_pair("new",dict_new),
+		method_pair("set",dict_set),
+		method_pair("get",dict_get)
 	}
 };
 

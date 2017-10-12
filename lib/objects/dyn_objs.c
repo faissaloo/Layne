@@ -85,21 +85,6 @@ struct method_list *type_method_lists[]={
 	#include "obj_method_list_refs.txt"
 };
 
-struct method_list *type_factory_method_lists[]={
-	&factory_type_methods,
-	&factory_factory_methods,
-	&factory_global_methods,
-	&factory_none_methods,
-	&factory_func_methods,
-	&factory_int_methods,
-	&factory_flt_methods,
-	&factory_bool_methods,
-	&factory_str_methods,
-	&factory_array_methods,
-	&factory_dict_methods
-	#include "obj_factory_method_list_refs.txt"
-};
-
 struct dyn_obj **type_factory_list[]={
 	&type_factory,
 	NULL, //Unimplemented (global)
@@ -157,6 +142,14 @@ void init_methods(struct dyn_obj *self, const struct method_list *methods)
 	for (iter_t i=1;i<=methods->count;i++)
 	{
 		bind_method(self,methods->method_pair[i-1].method_name,methods->method_pair[i-1].method);;
+	}
+}
+
+void init_factory_methods(struct dyn_obj *self, const struct method_list *methods)
+{
+	for (iter_t i=1;i<=methods->count;i++)
+	{
+		bind_method(self,methods->method_pair[i-1].method_name,methods->method_pair[i-1].factory_method);;
 	}
 }
 

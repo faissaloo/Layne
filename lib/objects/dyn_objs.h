@@ -55,8 +55,37 @@ struct dyn_obj* name(struct dyn_array *args)
 	self->size=type_sizes[typecode];\
 	self->cur_type=typecode;
 
+#define factory_setup(typecode)\
+	struct dyn_obj *self;\
+	self=GC_MALLOC(type_sizes[FACTORY]);\
+	self->members=hash_table_create(&string_eq,&hash_string);\
+	self->size=type_sizes[FACTORY];\
+	self->cur_type=FACTORY;\
+	((struct factory_obj*)self)->type_to_create=typecode;\
+	bind_member(self,"parent",*type_parent_list[FACTORY]);\
+	type_factory_list[((struct factory_obj*)self)->type_to_create]=&self;\
+	struct dyn_array *temp_array;\
+	temp_array=dyn_array_create();\
+	for (struct dyn_obj *i=self;!(i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==TYPE);i=get_member(i,"parent"))\
+	{\
+		if (i->cur_type==FACTORY)\
+		{\
+			dyn_array_append(temp_array,type_method_lists[((struct factory_obj*)i)->type_to_create]);\
+			type_sizes[((struct factory_obj*)self)->type_to_create]=max(type_sizes[((struct factory_obj*)self)->type_to_create],type_sizes[((struct factory_obj*)i)->type_to_create]);\
+		}\
+		else\
+		{\
+			dyn_array_append(temp_array,type_method_lists[i->cur_type]);\
+			type_sizes[((struct factory_obj*)self)->type_to_create]=max(type_sizes[((struct factory_obj*)self)->type_to_create],type_sizes[i->cur_type]);\
+		}\
+	}\
+	\
+	for (iter_t i=0;i<temp_array->filled;i++)\
+	{\
+		init_factory_methods(self,dyn_array_get(temp_array,i));\
+	}
+
 //This little function here will go through the 'parents' linked list backwards and apply every method, with ones closer to the object replacing the ones further
-//Maybe we should merge this and init_methods with object_setup
 //We're going to be lazy and use an array instead of a linked list to reverse the linked list for now but we should make a linked list type later
 #define inherit_setup()\
 	struct dyn_array *temp_array;\
@@ -77,30 +106,6 @@ struct dyn_obj* name(struct dyn_array *args)
 		init_methods(self,dyn_array_get(temp_array,i));\
 	}
 
-//Like inherit_setup but for a factory object
-//Put it at the top of every factory object
-#define inherit_factory_setup()\
-	type_factory_list[((struct factory_obj*)self)->type_to_create]=&self;\
-	struct dyn_array *temp_array;\
-	temp_array=dyn_array_create();\
-	for (struct dyn_obj *i=self;!(i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==TYPE);i=get_member(i,"parent"))\
-	{\
-		if (i->cur_type==FACTORY)\
-		{\
-			dyn_array_append(temp_array,type_factory_method_lists[((struct factory_obj*)i)->type_to_create]);\
-			type_sizes[((struct factory_obj*)self)->type_to_create]=max(type_sizes[((struct factory_obj*)self)->type_to_create],type_sizes[((struct factory_obj*)i)->type_to_create]);\
-		}\
-		else\
-		{\
-			dyn_array_append(temp_array,type_factory_method_lists[i->cur_type]);\
-			type_sizes[((struct factory_obj*)self)->type_to_create]=max(type_sizes[((struct factory_obj*)self)->type_to_create],type_sizes[i->cur_type]);\
-		}\
-	}\
-	\
-	for (iter_t i=0;i<temp_array->filled;i++)\
-	{\
-		init_methods(self,dyn_array_get(temp_array,i));\
-	}
 enum type
 {
 	TYPE, //The big daddy of our datatypes
@@ -123,6 +128,7 @@ struct method_pair
 {
 	char *method_name;
 	struct dyn_obj* (*method)(struct dyn_array*);
+	struct dyn_obj* (*factory_method)(struct dyn_array*);
 };
 
 struct method_list
@@ -130,15 +136,17 @@ struct method_list
 	size_t count;
 	struct method_pair method_pair[];
 };
-//We need to create a function to go through the list of methods and create them
+
+#define method_pair(name,func) {name,func,factory_##func}
+
 void init_methods(struct dyn_obj *self, const struct method_list *methods);
+void init_factory_methods(struct dyn_obj *self, const struct method_list *methods);
 
 extern const char *type_names[];
 extern size_t type_sizes[];
 extern struct dyn_obj **type_parent_list[];
 extern struct dyn_obj **type_factory_list[];
 extern struct method_list *type_method_lists[];
-extern struct method_list *type_factory_method_lists[];
 
 struct dyn_obj
 {

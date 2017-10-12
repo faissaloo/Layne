@@ -28,36 +28,9 @@
 #include "debug.h"
 #include "factory_obj.h"
 
-struct method_list factory_flt_methods={
-	16,
-	{
-		{"new",factory_flt_new},
-		{"add",factory_flt_add},
-		{"sub",factory_flt_sub},
-		{"mul",factory_flt_mul},
-		{"div",factory_flt_div},
-		{"mod",factory_flt_mod},
-		{"int",factory_flt_int},
-		{"flt",factory_flt_flt},
-		{"str",factory_flt_str},
-		{"hash",factory_flt_hash},
-		{"copy",factory_flt_copy},
-		{"eq",factory_flt_eq},
-		{"lt",factory_flt_lt},
-		{"le",factory_flt_le},
-		{"gt",factory_flt_gt},
-		{"ge",factory_flt_ge}
-	}
-};
-
 struct dyn_obj *create_flt_factory()
 {
-	object_setup(FACTORY);
-	((struct factory_obj*)self)->type_to_create=FLT;
-	//init_methods(self,&factory_flt_methods);
-
-	bind_member(self,"parent",*type_parent_list[self->cur_type]);
-	inherit_factory_setup();
+	factory_setup(FLT);
 	return self;
 }
 
@@ -69,22 +42,22 @@ double get_flt_val(struct dyn_obj *obj)
 struct method_list flt_methods={
 	16,
 	{
-		{"new",flt_new},
-		{"add",flt_add},
-		{"sub",flt_sub},
-		{"mul",flt_mul},
-		{"div",flt_div},
-		{"mod",flt_mod},
-		{"int",flt_int},
-		{"flt",flt_flt},
-		{"str",flt_str},
-		{"hash",flt_hash},
-		{"copy",flt_copy},
-		{"eq",flt_eq},
-		{"lt",flt_lt},
-		{"le",flt_le},
-		{"gt",flt_gt},
-		{"ge",flt_ge}
+		method_pair("new",flt_new),
+		method_pair("add",flt_add),
+		method_pair("sub",flt_sub),
+		method_pair("mul",flt_mul),
+		method_pair("div",flt_div),
+		method_pair("mod",flt_mod),
+		method_pair("int",flt_int),
+		method_pair("flt",flt_flt),
+		method_pair("str",flt_str),
+		method_pair("hash",flt_hash),
+		method_pair("copy",flt_copy),
+		method_pair("eq",flt_eq),
+		method_pair("lt",flt_lt),
+		method_pair("le",flt_le),
+		method_pair("gt",flt_gt),
+		method_pair("ge",flt_ge)
 	}
 };
 

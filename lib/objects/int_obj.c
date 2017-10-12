@@ -28,49 +28,44 @@
 
 struct dyn_obj *global;
 
-struct method_list factory_int_methods={
+struct method_list int_methods={
 	30,
 	{
-		{"new",factory_int_new},
-		{"add",factory_int_add},
-		{"iadd",factory_int_iadd},
-		{"sub",factory_int_sub},
-		{"isub",factory_int_isub},
-		{"mul",factory_int_mul},
-		{"imul",factory_int_imul},
-		{"div",factory_int_div},
-		{"idiv",factory_int_idiv},
-		{"int",factory_int_int},
-		{"str",factory_int_str},
-		{"hash",factory_int_hash},
-		{"copy",factory_int_copy},
-		{"eq",factory_int_eq},
-		{"lt",factory_int_lt},
-		{"le",factory_int_le},
-		{"gt",factory_int_gt},
-		{"ge",factory_int_ge},
-		{"or",factory_int_or},
-		{"ior",factory_int_ior},
-		{"and",factory_int_and},
-		{"iand",factory_int_iand},
-		{"xor",factory_int_xor},
-		{"ixor",factory_int_ixor},
-		{"neg",factory_int_neg},
-		{"ineg",factory_int_ineg},
-		{"not",factory_int_not},
-		{"inot",factory_int_inot},
-		{"mod",factory_int_mod},
-		{"imod",factory_int_imod}
+		method_pair("new",int_new),
+		method_pair("add",int_add),
+		method_pair("iadd",int_iadd),
+		method_pair("sub",int_sub),
+		method_pair("isub",int_isub),
+		method_pair("mul",int_mul),
+		method_pair("imul",int_imul),
+		method_pair("div",int_div),
+		method_pair("idiv",int_idiv),
+		method_pair("int",int_int),
+		method_pair("str",int_str),
+		method_pair("hash",int_hash),
+		method_pair("copy",int_copy),
+		method_pair("eq",int_eq),
+		method_pair("lt",int_lt),
+		method_pair("le",int_le),
+		method_pair("gt",int_gt),
+		method_pair("ge",int_ge),
+		method_pair("or",int_or),
+		method_pair("ior",int_ior),
+		method_pair("and",int_and),
+		method_pair("iand",int_iand),
+		method_pair("xor",int_xor),
+		method_pair("ixor",int_ixor),
+		method_pair("neg",int_neg),
+		method_pair("ineg",int_ineg),
+		method_pair("not",int_not),
+		method_pair("inot",int_inot),
+		method_pair("mod",int_mod),
+		method_pair("imod",int_imod)
 	}
 };
 struct dyn_obj *create_int_factory()
 {
-	object_setup(FACTORY);
-	((struct factory_obj*)self)->type_to_create=INT;
-	bind_member(self,"parent",*type_parent_list[self->cur_type]);
-
-	inherit_factory_setup();
-	//init_methods(self,&factory_int_methods);
+	factory_setup(INT);
 	return self;
 }
 
@@ -78,42 +73,6 @@ int get_int_val(struct dyn_obj *obj)
 {
 	return ((struct int_obj*)obj)->value;
 }
-
-struct method_list int_methods={
-	30,
-	{
-		{"new",int_new},
-		{"add",int_add},
-		{"iadd",int_iadd},
-		{"sub",int_sub},
-		{"isub",int_isub},
-		{"mul",int_mul},
-		{"imul",int_imul},
-		{"div",int_div},
-		{"idiv",int_idiv},
-		{"int",int_int},
-		{"str",int_str},
-		{"hash",int_hash},
-		{"copy",int_copy},
-		{"eq",int_eq},
-		{"lt",int_lt},
-		{"le",int_le},
-		{"gt",int_gt},
-		{"ge",int_ge},
-		{"or",int_or},
-		{"ior",int_ior},
-		{"and",int_and},
-		{"iand",int_iand},
-		{"xor",int_xor},
-		{"ixor",int_ixor},
-		{"neg",int_neg},
-		{"ineg",int_ineg},
-		{"not",int_not},
-		{"inot",int_inot},
-		{"mod",int_mod},
-		{"imod",int_imod}
-	}
-};
 
 struct dyn_obj* create_int(int value)
 {
