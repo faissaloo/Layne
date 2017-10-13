@@ -8,7 +8,7 @@ all: Makefile parserdata/main.o utils.o debug.o objects/factory_obj.o objects/gl
 dbg: CFLAGS+=-DDEBUG -g -Og -rdynamic
 dbg: all
 
-parserdata/main.o: parserdata/main.c parserdata/main.h parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_names.txt parserdata/obj_method_list_refs.txt
+parserdata/main.o: parserdata/main.c parserdata/main.h parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_names.txt parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt
 	$(CC) $(CFLAGS) -c parserdata/main.c -o parserdata/main.o
 
 debug.o: debug.c debug.h
@@ -41,7 +41,7 @@ objects/str_obj.o: objects/str_obj.c objects/str_obj.h objects/dyn_objs.h object
 objects/flt_obj.o: objects/flt_obj.c objects/flt_obj.h objects/dyn_objs.h objects/type_obj.h
 	$(CC) $(CFLAGS) -c objects/flt_obj.c -o objects/flt_obj.o
 
-objects/dyn_objs.o: objects/dyn_objs.c objects/dyn_objs.h datastructures/dyn_arrays.h datastructures/dyn_str.h datastructures/hash_tables.h objects/func_obj.h debug.h parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_names.txt
+objects/dyn_objs.o: objects/dyn_objs.c objects/dyn_objs.h datastructures/dyn_arrays.h datastructures/dyn_str.h datastructures/hash_tables.h objects/func_obj.h debug.h parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_names.txt parserdata/obj_type_parent_refs.txt
 	$(CC) $(CFLAGS) -c objects/dyn_objs.c -o objects/dyn_objs.o
 
 objects/func_obj.o: objects/func_obj.c objects/func_obj.h objects/dyn_objs.h objects/type_obj.h objects/none_obj.h

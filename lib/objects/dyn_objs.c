@@ -87,6 +87,7 @@ struct method_list *type_method_lists[]={
 
 struct dyn_obj **type_factory_list[]={
 	&type_factory,
+	NULL, //Unimplemented (factory)
 	NULL, //Unimplemented (global)
 	NULL, //Unimplemented (none)
 	NULL, //Unimplemented (func)
@@ -101,6 +102,7 @@ struct dyn_obj **type_factory_list[]={
 
 struct dyn_obj **type_parent_list[]={
 	&type_factory, //Type
+	&type_factory, //Factory
 	&type_factory, //Global
 	&type_factory, //None
 	&type_factory, //Func

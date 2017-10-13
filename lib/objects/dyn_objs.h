@@ -62,7 +62,7 @@ struct dyn_obj* name(struct dyn_array *args)
 	self->size=type_sizes[FACTORY];\
 	self->cur_type=FACTORY;\
 	((struct factory_obj*)self)->type_to_create=typecode;\
-	bind_member(self,"parent",*type_parent_list[FACTORY]);\
+	bind_member(self,"parent",*type_parent_list[typecode]);\
 	type_factory_list[((struct factory_obj*)self)->type_to_create]=&self;\
 	struct dyn_array *temp_array;\
 	temp_array=dyn_array_create();\
