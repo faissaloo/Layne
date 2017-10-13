@@ -62,7 +62,7 @@ def_dyn_fn(bool_new)
 	{
 		return call_method(get_arg(1),"bool",dyn_array_create());
 	}
-	return create_int(0);
+	return create_bool(0);
 }
 
 def_dyn_fn(bool_bool)
