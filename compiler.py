@@ -1320,13 +1320,13 @@ class declGen():
 				to_ret+="struct method_list "+i[-1].enum+"_methods = {\n"
 				to_ret+="\t"+str(len(i[-1].methods)+1)+",\n\t{\n"
 				for ii in i[-1].methods:
-					to_ret+='\t\t{"'+str(ii[-1].name)+'",FN_'+("_".join([str(iii.name) for iii in ii]))+"},\n"
-				to_ret+='\t\tmethod("new",FN_'+i[-1].fullname+"_new),\n"
+					to_ret+='\t\tmethod_pair("'+str(ii[-1].name)+'",FN_'+("_".join([str(iii.name) for iii in ii]))+"),\n"
+				to_ret+='\t\tmethod_pair("new",FN_'+i[-1].fullname+"_new),\n"
 				to_ret+="\t}\n};\n\n"
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
-				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tobject_setup(FACTORY);\n\t((struct factory_obj*)self)->type_to_create="+i[-1].enum+';\n\tbind_member(self,"parent",'+(i[-1].parent.C() if i[-1].parent else "type_factory")+');\n\ttype_factory_list['+i[-1].enum+']=&self;\n\tinherit_factory_setup();\n}\n'
+				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tfactory_setup("+i[-1].enum+');\n}\n'
 
 		#Method implementations
 		#Search for things in our list that match [PATH TO THE OBJECT][A FUNCTION]
@@ -1374,7 +1374,7 @@ class declGen():
 	def genObjSizes(self):
 		if self.objNames:
 			#The objects with parents are going to have their sizes changed at runtime when their factory objects are created
-			return "\t,\n\t"+",\n\t".join(["sizeof(struct type_obj)" for i in self.names if isinstance(i[-1],objStatement)])
+			return "\n\t"+",\n\t".join(["sizeof(struct type_obj)" for i in self.objNames])
 		else:
 			return ""
 #print(parsedSource)
