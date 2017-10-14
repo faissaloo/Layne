@@ -53,7 +53,6 @@ struct dyn_obj* name(struct dyn_array *args)
 	struct dyn_obj *self;\
 	self=GC_MALLOC(type_sizes[typecode]);\
 	self->members=hash_table_create(&string_eq,&hash_string);\
-	self->size=type_sizes[typecode];\
 	self->cur_type=typecode;\
 	bind_member(self,"parent",*type_parent_list[typecode]);\
 	init_methods(self,type_method_lists[typecode]);

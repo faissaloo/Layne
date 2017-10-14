@@ -164,8 +164,8 @@ struct dyn_obj* copy_obj(struct dyn_obj *obj, struct hash_table *spanned_objs)
 	}
 	struct dyn_obj *to_return;
 	//Lets create a get_type_size function later and use that
-	to_return=GC_MALLOC(obj->size);
-	memcpy(to_return,obj,obj->size);
+	to_return=GC_MALLOC(type_sizes[obj->cur_type]);
+	memcpy(to_return,obj,type_sizes[obj->cur_type]);
 
 	//Copy everything in the members hashtable
 	//Think Prim's algorithm
