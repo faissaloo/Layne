@@ -690,6 +690,8 @@ class whileStatement(inheritContextStatement):
 		self.code=code
 	def __repr__(self):
 		return "WHILE "+str(self.expr)+"\n"+str(self.code)
+	def C(self):
+		return 'while (get_bool_val(call_method_noargs('+self.expr.C()+',"bool")))\n'+self.code.C()
 
 class objStatement(newContextStatement):
 	def __init__(self,name,code,parent=None):
