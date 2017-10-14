@@ -1301,18 +1301,11 @@ class declGen():
 							i[-1].methods.append(ii)
 				if not i[-1].new:
 					to_ret+="decl_dyn_fn(FN_"+i[-1].fullname+"_new);\n"
-		declared_vars={}
+
 		#Backwards declarations
 		for i in self.names:
 			if isinstance(i[-1],funcStatement):
 				to_ret+='decl_dyn_fn(FN_'+("_".join([str(ii.name) for ii in i]))+');\n'
-			elif isinstance(i[-1],variable):
-				if ".".join([str(ii.name) for ii in i]) not in declared_vars:
-					if len(i)==1:
-						to_ret+='struct dyn_obj *'+i[-1].C()+";"
-					else:
-						i[-2].localvars.append(i[-1])
-					declared_vars[".".join([str(ii.name) for ii in i])]=True
 
 		#Method lists
 		for i in self.names:
@@ -1366,6 +1359,16 @@ class declGen():
 			elif (isinstance(i[-1],funcStatement) and len(i)==1) or (len(i)>1 and isinstance(i[-1],funcStatement) and isinstance(i[-2],funcStatement)): #Top level global functions
 				to_ret+=funcGen(i)
 		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=global;\n"
+
+		declared_vars={}
+		for i in self.names:
+			if isinstance(i[-1],variable):
+				if ".".join([str(ii.name) for ii in i]) not in declared_vars:
+					if len(i)==1:
+						to_ret+='struct dyn_obj *'+i[-1].C()+";"
+					else:
+						i[-2].localvars.append(i[-1])
+					declared_vars[".".join([str(ii.name) for ii in i])]=True
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
 				to_ret+="create_"+i[-1].enum+"_factory();"
