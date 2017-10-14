@@ -5,7 +5,7 @@ all: Makefile parserdata/main.o utils.o debug.o objects/factory_obj.o objects/gl
 	$(CC) $(CFLAGS) parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/array_obj.o objects/dict_obj.o -lgc -lm
 
 #We need to have it so that if we already have an executable that was compiled without debug mode it should be recompiled entirely but not otherwise
-dbg: CFLAGS+=-DDEBUG -g -Og -rdynamic
+dbg: CFLAGS+=-DDEBUG -g -pg -Og -rdynamic
 dbg: all
 
 parserdata/main.o: parserdata/main.c parserdata/main.h parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt parserdata/obj_type_factory_list_refs.txt parserdata/obj_enums.txt parserdata/obj_sizes.txt parserdata/obj_names.txt parserdata/obj_method_list_refs.txt parserdata/obj_type_parent_refs.txt
