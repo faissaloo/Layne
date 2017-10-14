@@ -76,9 +76,7 @@ int get_int_val(struct dyn_obj *obj)
 
 struct dyn_obj* create_int(int value)
 {
-	object_setup(INT);
-	bind_member(self,"parent",*type_parent_list[self->cur_type]);
-	inherit_setup();
+	obj_setup_basic(INT);
 	((struct int_obj*)self)->value=value;
 	return self;
 }

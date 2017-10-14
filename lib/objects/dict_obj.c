@@ -51,8 +51,7 @@ struct hash_table* dyn_obj_ht_from(size_t count,struct ht_item_init initial[])
 
 struct dyn_obj* create_dict(struct hash_table *ht)
 {
-	object_setup(DICT);
-	init_methods(self,&dict_methods);
+	obj_setup_basic(DICT);
 	if (ht==NULL)
 	{
 		((struct dict_obj*)self)->data=hash_table_create(dyn_objs_eq,dyn_objs_hash);
@@ -61,7 +60,6 @@ struct dyn_obj* create_dict(struct hash_table *ht)
 	{
 		((struct dict_obj*)self)->data=ht;
 	}
-	bind_member(self,"parent",type_factory);
 	return self;
 }
 

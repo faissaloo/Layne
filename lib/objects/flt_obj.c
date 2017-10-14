@@ -63,10 +63,7 @@ struct method_list flt_methods={
 
 struct dyn_obj* create_flt(double value)
 {
-	object_setup(FLT);
-	init_methods(self,&flt_methods);
-
-	bind_member(self,"parent",get_member(global,"type"));
+	obj_setup_basic(FLT);
 	((struct flt_obj*)self)->value=value;
 	return self;
 }

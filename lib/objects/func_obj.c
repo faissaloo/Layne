@@ -18,6 +18,7 @@
 #include <gc.h>
 
 #include "dyn_objs.h"
+#include "factory_obj.h"
 #include "func_obj.h"
 #include "none_obj.h"
 #include "debug.h"
@@ -28,8 +29,7 @@ struct method_list factory_func_methods={0,{}};
 
 struct dyn_obj* create_function(struct dyn_obj* (*function)(struct dyn_array*))
 {
-	object_setup(FUNCTION);
-	init_methods(self,&func_methods);
+	obj_setup_basic(FUNCTION);
 
 	bind_member(self,"call",self);
 	((struct func_obj*)self)->function=function;
@@ -44,7 +44,6 @@ struct dyn_obj* create_function(struct dyn_obj* (*function)(struct dyn_array*))
 	bind_member(copy_func,"copy",copy_func);
 
 	bind_member(self,"copy",copy_func);
-	bind_member(self,"parent",*type_parent_list[self->cur_type]);
 	return self;
 }
 

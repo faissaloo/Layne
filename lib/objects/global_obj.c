@@ -41,8 +41,7 @@ struct method_list factory_global_methods={1,{"print",factory_global_print}};
 
 struct dyn_obj* create_global()
 {
-	object_setup(GLOBAL);
-	init_methods(self,&global_methods);
+	obj_setup_basic(GLOBAL);
 	global=self;
 	type_factory=create_type_factory();
 	bool_factory=create_bool_factory();

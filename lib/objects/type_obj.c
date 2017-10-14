@@ -39,7 +39,7 @@ struct method_list factory_type_methods={
 
 struct dyn_obj *create_type_factory()
 {
-	object_setup(FACTORY);
+	obj_setup_basic(FACTORY);
 	init_methods(self,&factory_type_methods);
 
 	//global object can't give itself a parent that doesn't yet exist

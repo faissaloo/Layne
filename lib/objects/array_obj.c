@@ -42,10 +42,8 @@ struct method_list array_methods={
 
 struct dyn_obj* create_array(struct dyn_array *ary)
 {
-	object_setup(ARRAY);
-	init_methods(self,&array_methods);
+	obj_setup_basic(ARRAY);
 	((struct array_obj*)self)->data=ary;
-	bind_member(self,"parent",type_factory);
 	return self;
 }
 

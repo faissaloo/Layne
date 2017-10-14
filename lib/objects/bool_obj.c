@@ -126,11 +126,7 @@ def_dyn_fn(bool_str)
 
 struct dyn_obj* create_bool(bool value)
 {
-	object_setup(BOOL);
-
-	init_methods(self,&bool_methods);
-
-	bind_member(self,"parent",get_member(global,"type"));
+	obj_setup_basic(BOOL);
 	((struct bool_obj*)self)->value=value;
 	return self;
 }

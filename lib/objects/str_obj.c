@@ -51,11 +51,7 @@ struct dyn_str* get_str_val(struct dyn_obj *obj)
 
 struct dyn_obj* create_str(struct dyn_str *data)
 {
-	object_setup(STR);
-
-	init_methods(self,&str_methods);
-
-	bind_member(self,"parent",get_member(global,"type"));
+	obj_setup_basic(STR);
 	((struct str_obj*)self)->data=dyn_str_create();
 
 	if (data!=NULL)

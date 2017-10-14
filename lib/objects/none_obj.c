@@ -19,6 +19,7 @@
 
 #include "dyn_objs.h"
 #include "none_obj.h"
+#include "factory_obj.h"
 
 struct method_list none_methods={
 	1,
@@ -37,8 +38,6 @@ struct method_list factory_none_methods={
 struct dyn_obj* create_none()
 {
 	object_setup(NONE);
-	init_methods(self,&none_methods);
-	bind_member(self,"parent",type_factory);
 	return self;
 }
 
