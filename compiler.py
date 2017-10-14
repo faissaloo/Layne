@@ -592,7 +592,7 @@ class brackExpr(list):
 			self.insert(0,current.operand2)
 			current=current.operand1
 		#Fix for empty parameters, make less hacky later
-		if current!=tree:
+		if current!=None:
 			self.insert(0,current)
 
 	def __repr__(self):
@@ -721,7 +721,7 @@ class funcParamList(list):
 			self.insert(0,funcParam(current.operand2))
 			current=current.operand1
 		#Fix for empty parameters, make less hacky later
-		if current!=tree:
+		if current!=None:
 			self.insert(0,funcParam(current))
 
 	def minLen(self):
@@ -1339,6 +1339,7 @@ class declGen():
 				'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(iii.type.C())+")->type_to_create") if iii.type else ",TYPE" for iii in ii[-1].param]))+
 				'}));\n\t#endif\n')
 			to_ret+='\tstruct dyn_obj* self=get_arg(0);\n'
+
 			for iii,j in enumerate(ii[-1].param):
 				if j.default:
 					to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args->filled>='+str(iii+1)+'?get_arg('+str(iii+1)+'):'+j.default.C()+';\n'
