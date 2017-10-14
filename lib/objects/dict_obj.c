@@ -36,7 +36,7 @@ struct method_list dict_methods={
 
 int dyn_objs_eq(void *a,void *b)
 {
-	return get_bool_val(call_method((struct dyn_obj*)a,"eq",dyn_array_from(1,(void *[]){b})));
+	return get_bool_val(call_method((struct dyn_obj*)a,"eq",1,(struct dyn_obj*[]){b}));
 }
 
 hash_t dyn_objs_hash(void *in_obj)
@@ -65,9 +65,9 @@ struct dyn_obj* create_dict(struct hash_table *ht)
 
 def_dyn_fn(dict_new)
 {
-	if (args->filled>1)
+	if (arg_count>1)
 	{
-		return call_method_noargs(get_arg(1),"dict");
+		return call_method_noargs(args[1],"dict");
 	}
 	return create_dict(NULL);
 }

@@ -121,7 +121,7 @@ void bind_member(struct dyn_obj *obj, char member_name[], struct dyn_obj *member
 }
 
 //Binds a function implemented in C to a function
-void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)(struct dyn_array*))
+void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)(size_t arg_count, struct dyn_obj *args[]))
 {
 	bind_member(obj, method_name, create_function(cfunc));
 }
@@ -198,12 +198,12 @@ struct dyn_obj* copy_obj(struct dyn_obj *obj, struct hash_table *spanned_objs)
 		}
 	}
 
-	call_method(obj,"copy",dyn_array_from(1,(void *[]){to_return}));
+	call_method(obj,"copy",1,(struct dyn_obj*[]){to_return});
 
 	return to_return;
 }
 
-struct dyn_obj* call_function(struct dyn_obj *object_to_call, struct dyn_array *args)
+struct dyn_obj* call_function(struct dyn_obj *object_to_call, size_t arg_count, struct dyn_obj *args[])
 {
 	struct dyn_obj *func_to_call;
 	//We start with the main object then descend to the most basic callable
@@ -219,19 +219,25 @@ struct dyn_obj* call_function(struct dyn_obj *object_to_call, struct dyn_array *
 			}
 		#endif
 	}
-	return ((struct func_obj*)func_to_call)->function(args);
+	return ((struct func_obj*)func_to_call)->function(arg_count,args);
 }
 
-struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], struct dyn_array *args)
+struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], size_t arg_count, struct dyn_obj *args[])
 {
-	dyn_array_insert(args,0,obj);
-	return call_function(get_member(obj,method_name),args);
+	struct dyn_obj **new_args;
+	new_args=GC_MALLOC(sizeof(struct dyn_obj*)*(arg_count+1));
+	*new_args=obj;
+	if (arg_count>0)
+	{
+		memcpy(&new_args[1],args,sizeof(struct dyn_obj*)*arg_count);	
+	}
+	return call_function(get_member(obj,method_name),arg_count+1,new_args);
 }
 
 //Calls a method which only passes self to the object
 struct dyn_obj* call_method_noargs(struct dyn_obj *obj, char method_name[])
 {
-	return call_function(get_member(obj,method_name),dyn_array_from(1,(void *[]){obj}));
+	return call_function(get_member(obj,method_name),1,(struct dyn_obj*[]){obj});
 }
 
 //Registers the destructor for the object

@@ -69,9 +69,9 @@ def_dyn_fn(str_eq)
 
 def_dyn_fn(str_new)
 {
-	if (args->filled>1)
+	if (arg_count>1)
 	{
-		return call_method(get_arg(1),"str",dyn_array_create());
+		return call_method(get_arg(1),"str",0,NULL);
 	}
 	return create_str(NULL);
 }
@@ -108,7 +108,7 @@ def_dyn_fn(str_hash)
 def_dyn_fn(str_int)
 {
 	//The dyn_str library should have a to integer function
-	return create_int(dyn_str_to_int(SELF));
+	return create_int(dyn_str_to_int(get_str_val(SELF)));
 }
 
 def_dyn_fn(str_str)

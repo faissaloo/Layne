@@ -27,7 +27,7 @@
 struct method_list func_methods={0,{}};
 struct method_list factory_func_methods={0,{}};
 
-struct dyn_obj* create_function(struct dyn_obj* (*function)(struct dyn_array*))
+struct dyn_obj* create_function(struct dyn_obj* (*function)(size_t arg_count, struct dyn_obj *args[]))
 {
 	obj_setup_basic(FUNCTION);
 
@@ -37,7 +37,6 @@ struct dyn_obj* create_function(struct dyn_obj* (*function)(struct dyn_array*))
 	struct dyn_obj *copy_func;
 	copy_func=GC_MALLOC(sizeof(struct func_obj));
 	copy_func->members=hash_table_create(&string_eq,&hash_string);
-	copy_func->size=sizeof(struct func_obj);
 	copy_func->cur_type=FUNCTION;
 	((struct func_obj*)copy_func)->function=func_copy;
 	bind_member(copy_func,"call",copy_func);

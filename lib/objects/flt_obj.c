@@ -74,10 +74,10 @@ def_dyn_fn(flt_new)
 		arg_guard(1,2,protect({"self","x"}),protect({FLT,TYPE}));
 	#endif
 
-	//Value to create the int from
-	if (args->filled>1)
+	//Value to create the flt from
+	if (arg_count>1)
 	{
-		return call_method(get_arg(1),"flt",dyn_array_create());
+		return call_method_noargs(args[1],"flt");
 	}
 	return create_flt(0);
 }

@@ -49,9 +49,9 @@ struct dyn_obj* create_array(struct dyn_array *ary)
 
 def_dyn_fn(array_new)
 {
-	if (args->filled>1)
+	if (arg_count>1)
 	{
-		return call_method(get_arg(1),"array",dyn_array_create());
+		return call_method_noargs(args[1],"array");
 	}
 	return create_array(NULL);
 }
@@ -59,17 +59,14 @@ def_dyn_fn(array_new)
 //Compares every item in the array
 def_dyn_fn(array_eq)
 {
-	if (((struct array_obj*)SELF)->data->filled!=((struct array_obj*)get_arg(1))->data->filled)
+	if (((struct array_obj*)SELF)->data->filled!=((struct array_obj*)args[1])->data->filled)
 	{
 		return create_bool(false);
 	}
 
 	for (iter_t i=0;i<((struct array_obj*)SELF)->data->filled;i++)
 	{
-		struct dyn_array *current_item;
-		current_item=dyn_array_create();
-		dyn_array_append(current_item,dyn_array_get(((struct array_obj*)get_arg(1))->data,i));
-		if (!get_bool_val(call_method(dyn_array_get(((struct array_obj*)SELF)->data,i),"eq",current_item)))
+		if (!get_bool_val(call_method(dyn_array_get(((struct array_obj*)SELF)->data,i),"eq",1,(struct dyn_obj*[]){dyn_array_get(((struct array_obj*)args[1])->data,i)})))
 		{
 			return create_bool(false);
 		}
@@ -86,7 +83,7 @@ def_dyn_fn(array_set)
 //Array[x]
 def_dyn_fn(array_get)
 {
-	if (args->filled==2)
+	if (arg_count==2)
 	{
 		return (struct dyn_obj*)dyn_array_get(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)));
 	}

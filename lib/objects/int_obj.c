@@ -88,9 +88,9 @@ def_dyn_fn(int_new)
 	#endif
 
 	//Value to create the int from
-	if (args->filled>1)
+	if (arg_count>1)
 	{
-		return call_method(get_arg(1),"int",dyn_array_create());
+		return call_method_noargs(args[1],"int");
 	}
 	return create_int(0);
 }
@@ -261,8 +261,7 @@ def_dyn_fn(int_lt)
 	#ifdef DEBUG
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
-
-	return create_bool(get_int_val(SELF)<get_int_val(get_arg(1)));
+	return create_bool(get_int_val(SELF)<get_int_val(args[1]));
 }
 
 def_dyn_fn(int_le)

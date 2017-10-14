@@ -30,20 +30,19 @@
 #define struct_cast(strct,variable) *((strct*)&variable)
 
 //Creates a function meant to be used by the user
-#define decl_dyn_fn(name) struct dyn_obj* name(struct dyn_array *args);\
-struct dyn_obj* factory_##name(struct dyn_array *args);
+#define decl_dyn_fn(name) struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[]);\
+struct dyn_obj* factory_##name(size_t arg_count, struct dyn_obj *args[]);
 //Like dyn_fn but all it does is pop the self and pass the rest of its arguments on to a function
 //Like how you can do int.__method__(x) in python instead of x.__method__() this is mainly so
 //children can call a parent's equivelant of a method as needed
-#define def_dyn_fn(name) struct dyn_obj* name(struct dyn_array *args);\
-struct dyn_obj* factory_##name(struct dyn_array *args)\
+#define def_dyn_fn(name) struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[]);\
+struct dyn_obj* factory_##name(size_t arg_count, struct dyn_obj *args[])\
 {\
-	dyn_array_remove(args,0);\
-	return name(args);\
+	return name(arg_count-1,args+sizeof(struct dyn_obj*));\
 }\
-struct dyn_obj* name(struct dyn_array *args)
+struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[])
 
-#define get_arg(x) dyn_array_get(args,x)
+#define get_arg(x) args[x]
 
 //Gets self for methods
 #define SELF get_arg(0)
@@ -63,7 +62,6 @@ struct dyn_obj* name(struct dyn_array *args)
 	struct dyn_obj *self;\
 	self=GC_MALLOC(type_sizes[typecode]);\
 	self->members=hash_table_create(&string_eq,&hash_string);\
-	self->size=type_sizes[typecode];\
 	self->cur_type=typecode;\
 	bind_member(self,"parent",*type_parent_list[typecode]);\
 	struct dyn_array *temp_array;\
@@ -89,7 +87,6 @@ struct dyn_obj* name(struct dyn_array *args)
 	struct dyn_obj *self;\
 	self=GC_MALLOC(type_sizes[FACTORY]);\
 	self->members=hash_table_create(&string_eq,&hash_string);\
-	self->size=type_sizes[FACTORY];\
 	self->cur_type=FACTORY;\
 	((struct factory_obj*)self)->type_to_create=typecode;\
 	bind_member(self,"parent",*type_parent_list[typecode]);\
@@ -136,8 +133,8 @@ enum type
 struct method_pair
 {
 	char *method_name;
-	struct dyn_obj* (*method)(struct dyn_array*);
-	struct dyn_obj* (*factory_method)(struct dyn_array*);
+	struct dyn_obj* (*method)(size_t arg_count, struct dyn_obj *args[]);
+	struct dyn_obj* (*factory_method)(size_t arg_count, struct dyn_obj *args[]);
 };
 
 struct method_list
@@ -162,8 +159,6 @@ struct dyn_obj
 	//Pointers to all members of the object,
 	//which will all be dyn_objs
 	struct hash_table *members;
-	size_t size; //Size (for copying)
-
 	//The data stored is a function
 	enum type cur_type;
 };
@@ -181,12 +176,12 @@ struct dict_obj
 };*/
 
 void bind_member(struct dyn_obj *obj, char member_name[], struct dyn_obj *member_obj);
-void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)(struct dyn_array*));
+void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)(size_t arg_count, struct dyn_obj *args[]));
 struct dyn_obj* get_member(struct dyn_obj *obj,char member_name[]);
 struct dyn_obj* copy_obj(struct dyn_obj *obj,struct hash_table *spanned_objs);
-struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], struct dyn_array *args);
+struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], size_t arg_count, struct dyn_obj *args[]);
 struct dyn_obj* call_method_noargs(struct dyn_obj *obj, char method_name[]);
-struct dyn_obj* call_function(struct dyn_obj *object_to_call, struct dyn_array *args);
+struct dyn_obj* call_function(struct dyn_obj *object_to_call, size_t arg_count, struct dyn_obj *args[]);
 bool is_child(struct dyn_obj *obj,enum type type_id);
 void reg_destructor(struct dyn_obj *obj);
 

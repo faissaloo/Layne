@@ -46,32 +46,31 @@
 			exit(errno);\
 		}
 
-		//Checks arguments for functions with fixed length arguments
-		//NOTE: This is inconsistent, args->filled and args->length should both be size_ts
+		//Checks arguments for functions
 		#define arg_guard(min_args,max_args,names,types)\
 		{\
 			enum type argument_type_array[]=types;\
 			const char *argument_names_array[]=names;\
 			if (min_args!=max_args)\
 			{\
-				if (args->filled>max_args)\
+				if (arg_count>max_args)\
 				{\
-					error(1,"Too many arguments, expected at most %i, got %i",max_args,args->filled);\
+					error(1,"Too many arguments, expected at most %li, got %li",(size_t)max_args,arg_count);\
 				}\
-				else if (args->filled<min_args)\
+				else if (arg_count<min_args)\
 				{\
-					error(1,"Too few arguments, expected at least %i, got %i",min_args,args->filled);\
+					error(1,"Too few arguments, expected at least %li, got %li",(size_t)min_args,arg_count);\
 				}\
 			}\
-			else if(args->filled>max_args)\
+			else if(arg_count>max_args)\
 			{\
-				error(1,"Too many arguments, expected %i, got %i",max_args,args->filled)\
+				error(1,"Too many arguments, expected %li, got %li",(size_t)max_args,arg_count)\
 			}\
-			else if(args->filled<max_args)\
+			else if(arg_count<max_args)\
 			{\
-				error(1,"Too few arguments, expected %i, got %i",max_args,args->filled)\
+				error(1,"Too few arguments, expected %li, got %li",(size_t)max_args,arg_count)\
 			}\
-			for (iter_t current_argument_i=0;current_argument_i<args->filled;current_argument_i++)\
+			for (iter_t current_argument_i=0;current_argument_i<arg_count;current_argument_i++)\
 			{\
 				if (!is_child(get_arg(current_argument_i),argument_type_array[current_argument_i]))\
 				{\

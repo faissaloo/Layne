@@ -21,11 +21,11 @@
 #include "dyn_objs.h"
 #include "type_obj.h"
 
-struct dyn_obj* create_function(struct dyn_obj* (*function)(struct dyn_array*));
+struct dyn_obj* create_function(struct dyn_obj* (*function)(size_t arg_count, struct dyn_obj *args[]));
 struct func_obj
 {
 	struct type_obj parent;
-	struct dyn_obj* (*function)(struct dyn_array* args);
+	struct dyn_obj* (*function)(size_t arg_count, struct dyn_obj *args[]);
 };
 
 extern struct method_list func_methods;
