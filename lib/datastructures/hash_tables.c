@@ -42,9 +42,8 @@ int string_eq(void *a, void *b)
 
 hash_t hash_string(void *in_str)
 {
-	int in_len=strlen((char*)in_str);
 	hash_t hash=0;
-	for (int i=0;i<in_len;i++)
+	for (iter_t i=0;((char*)in_str)[i]!='\0';i++)
 	{
 		hash *= 31;
 		hash += ((char*)in_str)[i];
