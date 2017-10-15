@@ -77,7 +77,7 @@ def_dyn_fn(array_eq)
 //array[x]=y
 def_dyn_fn(array_set)
 {
-	dyn_array_set(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)),get_arg(2));
+	dyn_array_set(((struct array_obj*)SELF)->data,get_int_val(args[1]),args[2]);
 	return create_none();
 }
 //Array[x]
@@ -85,23 +85,23 @@ def_dyn_fn(array_get)
 {
 	if (arg_count==2)
 	{
-		return (struct dyn_obj*)dyn_array_get(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)));
+		return (struct dyn_obj*)dyn_array_get(((struct array_obj*)SELF)->data,get_int_val(args[1]));
 	}
 	else
 	{
-		return create_array(dyn_array_cut(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)),get_int_val(get_arg(2))));
+		return create_array(dyn_array_cut(((struct array_obj*)SELF)->data,get_int_val(args[1]),get_int_val(args[2])));
 	}
 }
 
 def_dyn_fn(array_ins)
 {
-	dyn_array_insert(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)),get_arg(2));
+	dyn_array_insert(((struct array_obj*)SELF)->data,get_int_val(args[1]),args[2]);
 	return create_none();
 }
 
 def_dyn_fn(array_del)
 {
-	dyn_array_remove(((struct array_obj*)SELF)->data,get_int_val(get_arg(1)));
+	dyn_array_remove(((struct array_obj*)SELF)->data,get_int_val(args[1]));
 	return create_none();
 }
 

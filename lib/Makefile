@@ -1,5 +1,5 @@
 CC:=gcc
-CFLAGS+= -I . -I datastructures -I objects -I parserdata
+CFLAGS+= -I . -I datastructures -I objects -I parserdata -O3
 
 all: Makefile parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/dict_obj.o objects/array_obj.o
 	$(CC) $(CFLAGS) parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/array_obj.o objects/dict_obj.o -lgc -lm

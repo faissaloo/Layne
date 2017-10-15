@@ -130,7 +130,7 @@ def_dyn_fn(int_copy) //copy(self,new_obj)
 	#endif
 
 	//new_obj.function=self.function
-	((struct int_obj*)get_arg(1))->value=get_int_val(SELF);
+	((struct int_obj*)args[1])->value=get_int_val(SELF);
 	return create_none();
 }
 
@@ -141,7 +141,7 @@ def_dyn_fn(int_add) //add(self,x)
 	#endif
 
 	//int(self+operand)
-	return create_int(get_int_val(SELF)+get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)+get_int_val(args[1]));
 }
 
 def_dyn_fn(int_iadd)
@@ -151,7 +151,7 @@ def_dyn_fn(int_iadd)
 	#endif
 
 	//self+=operand
-	((struct int_obj*)SELF)->value+=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value+=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -162,7 +162,7 @@ def_dyn_fn(int_sub) //sub(self,operand)
 	#endif
 
 	//int(self+operand)
-	return create_int(get_int_val(SELF)-get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)-get_int_val(args[1]));
 }
 
 def_dyn_fn(int_isub)
@@ -172,7 +172,7 @@ def_dyn_fn(int_isub)
 	#endif
 
 	//self-=operand
-	((struct int_obj*)SELF)->value-=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value-=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -182,7 +182,7 @@ def_dyn_fn(int_mul) //mul(self,operand)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_int(get_int_val(SELF)*get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)*get_int_val(args[1]));
 }
 
 def_dyn_fn(int_imul)
@@ -192,7 +192,7 @@ def_dyn_fn(int_imul)
 	#endif
 
 	//self*=operand
-	((struct int_obj*)SELF)->value*=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value*=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -203,7 +203,7 @@ def_dyn_fn(int_div) //div(self,operand)
 	#endif
 
 	//int(self/operand)
-	return create_int(get_int_val(SELF)/get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)/get_int_val(args[1]));
 }
 
 def_dyn_fn(int_idiv)
@@ -213,7 +213,7 @@ def_dyn_fn(int_idiv)
 	#endif
 
 	//self/=operand
-	((struct int_obj*)SELF)->value/=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value/=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -224,7 +224,7 @@ def_dyn_fn(int_mod) //div(self,operand)
 	#endif
 
 	//int(self%operand)
-	return create_int(get_int_val(SELF)%get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)%get_int_val(args[1]));
 }
 
 def_dyn_fn(int_imod)
@@ -234,7 +234,7 @@ def_dyn_fn(int_imod)
 	#endif
 
 	//self%=operand
-	((struct int_obj*)SELF)->value%=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value%=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -253,7 +253,7 @@ def_dyn_fn(int_eq)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)==get_int_val(get_arg(1)));
+	return create_bool(get_int_val(SELF)==get_int_val(args[1]));
 }
 
 def_dyn_fn(int_lt)
@@ -270,7 +270,7 @@ def_dyn_fn(int_le)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)<=get_int_val(get_arg(1)));
+	return create_bool(get_int_val(SELF)<=get_int_val(args[1]));
 }
 
 def_dyn_fn(int_gt)
@@ -279,7 +279,7 @@ def_dyn_fn(int_gt)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)>get_int_val(get_arg(1)));
+	return create_bool(get_int_val(SELF)>get_int_val(args[1]));
 }
 
 def_dyn_fn(int_ge)
@@ -288,7 +288,7 @@ def_dyn_fn(int_ge)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)>=get_int_val(get_arg(1)));
+	return create_bool(get_int_val(SELF)>=get_int_val(args[1]));
 }
 
 def_dyn_fn(int_and)
@@ -297,7 +297,7 @@ def_dyn_fn(int_and)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_int(get_int_val(SELF)&get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)&get_int_val(args[1]));
 }
 
 def_dyn_fn(int_iand)
@@ -307,7 +307,7 @@ def_dyn_fn(int_iand)
 	#endif
 
 	//self&=operand
-	((struct int_obj*)SELF)->value&=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value&=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -317,7 +317,7 @@ def_dyn_fn(int_or)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_int(get_int_val(SELF)|get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)|get_int_val(args[1]));
 }
 
 def_dyn_fn(int_ior)
@@ -327,7 +327,7 @@ def_dyn_fn(int_ior)
 	#endif
 
 	//self|=operand
-	((struct int_obj*)SELF)->value|=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value|=get_int_val(args[1]);
 	return SELF;
 }
 
@@ -337,7 +337,7 @@ def_dyn_fn(int_xor)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_int(get_int_val(SELF)^get_int_val(get_arg(1)));
+	return create_int(get_int_val(SELF)^get_int_val(args[1]));
 }
 
 def_dyn_fn(int_ixor)
@@ -347,7 +347,7 @@ def_dyn_fn(int_ixor)
 	#endif
 
 	//self^=operand
-	((struct int_obj*)SELF)->value^=get_int_val(get_arg(1));
+	((struct int_obj*)SELF)->value^=get_int_val(args[1]);
 	return SELF;
 }
 

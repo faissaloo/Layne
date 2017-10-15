@@ -90,7 +90,7 @@ def_dyn_fn(bool_or) //or(self,operand)
 	#endif
 
 	//bool(self||operand)
-	return create_bool(get_bool_val(SELF)||get_bool_val(get_arg(1)));
+	return create_bool(get_bool_val(SELF)||get_bool_val(args[1]));
 }
 
 def_dyn_fn(bool_and) //and(self,operand)
@@ -100,7 +100,7 @@ def_dyn_fn(bool_and) //and(self,operand)
 	#endif
 
 	//bool(self||operand)
-	return create_bool(get_bool_val(SELF)&&get_bool_val(get_arg(1)));
+	return create_bool(get_bool_val(SELF)&&get_bool_val(args[1]));
 }
 
 def_dyn_fn(bool_xor) //xor(self,operand)
@@ -109,7 +109,7 @@ def_dyn_fn(bool_xor) //xor(self,operand)
 		arg_guard(2,2,protect({"self","x"}),protect({BOOL,BOOL}));
 	#endif
 
-	return create_bool(get_bool_val(SELF)^get_bool_val(get_arg(1)));
+	return create_bool(get_bool_val(SELF)^get_bool_val(args[1]));
 }
 
 def_dyn_fn(bool_str)

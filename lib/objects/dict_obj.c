@@ -74,11 +74,11 @@ def_dyn_fn(dict_new)
 
 def_dyn_fn(dict_set)
 {
-	hash_table_add(((struct dict_obj*)SELF)->data,get_arg(1),get_arg(2));
+	hash_table_add(((struct dict_obj*)SELF)->data,args[1],args[2]);
 	return create_none();
 }
 
 def_dyn_fn(dict_get)
 {
-	return (struct dyn_obj*)hash_table_get(((struct dict_obj*)SELF)->data,get_arg(1));
+	return (struct dyn_obj*)hash_table_get(((struct dict_obj*)SELF)->data,args[1]);
 }

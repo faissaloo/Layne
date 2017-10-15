@@ -64,14 +64,14 @@ struct dyn_obj* create_str(struct dyn_str *data)
 
 def_dyn_fn(str_eq)
 {
-	return create_bool(dyn_str_eq(get_str_val(SELF),get_str_val(get_arg(1))));
+	return create_bool(dyn_str_eq(get_str_val(SELF),get_str_val(args[1])));
 }
 
 def_dyn_fn(str_new)
 {
 	if (arg_count>1)
 	{
-		return call_method(get_arg(1),"str",0,NULL);
+		return call_method(args[1],"str",0,NULL);
 	}
 	return create_str(NULL);
 }
@@ -80,24 +80,24 @@ def_dyn_fn(str_add)
 {
 	struct dyn_obj *new_str;
 	new_str=create_str(get_str_val(SELF));
-	dyn_str_cat(get_str_val(new_str),get_str_val(get_arg(1)));
+	dyn_str_cat(get_str_val(new_str),get_str_val(args[1]));
 	return new_str;
 }
 
 def_dyn_fn(str_iadd)
 {
-	dyn_str_cat(get_str_val(SELF),get_str_val(get_arg(1)));
+	dyn_str_cat(get_str_val(SELF),get_str_val(args[1]));
 	return SELF;
 }
 
 def_dyn_fn(str_get)
 {
-	return create_str(dyn_str_get_char(get_str_val(SELF), get_int_val(get_arg(1))));
+	return create_str(dyn_str_get_char(get_str_val(SELF), get_int_val(args[1])));
 }
 
 def_dyn_fn(str_cut) //cut(self,start,stop)
 {
-	return create_str(dyn_str_cut(get_str_val(SELF),get_int_val(get_arg(1)),get_int_val(get_arg(2))));
+	return create_str(dyn_str_cut(get_str_val(SELF),get_int_val(args[1]),get_int_val(args[2])));
 }
 
 def_dyn_fn(str_hash)

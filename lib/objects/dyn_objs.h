@@ -42,10 +42,8 @@ struct dyn_obj* factory_##name(size_t arg_count, struct dyn_obj *args[])\
 }\
 struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[])
 
-#define get_arg(x) args[x]
-
 //Gets self for methods
-#define SELF get_arg(0)
+#define SELF args[0]
 
 //Without method inheritence or destructor support
 #define obj_setup_basic(typecode)\

@@ -126,7 +126,7 @@ def_dyn_fn(flt_copy) //copy(self,new_obj)
 	#endif
 
 	//new_obj.function=self.function
-	((struct flt_obj*)get_arg(1))->value=get_flt_val(SELF);
+	((struct flt_obj*)args[1])->value=get_flt_val(SELF);
 	return create_none();
 }
 
@@ -137,7 +137,7 @@ def_dyn_fn(flt_add) //add(self,operand)
 	#endif
 
 	//flt(self+x)
-	return create_flt(get_flt_val(SELF)+get_flt_val(get_arg(1)));
+	return create_flt(get_flt_val(SELF)+get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_sub) //sub(self,x)
@@ -146,7 +146,7 @@ def_dyn_fn(flt_sub) //sub(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//flt(self-x)
-	return create_flt(get_flt_val(SELF)-get_flt_val(get_arg(1)));
+	return create_flt(get_flt_val(SELF)-get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_mul) //mul(self,x)
@@ -155,7 +155,7 @@ def_dyn_fn(flt_mul) //mul(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//flt(self*x)
-	return create_flt(get_flt_val(SELF)*get_flt_val(get_arg(1)));
+	return create_flt(get_flt_val(SELF)*get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_div) //div(self,x)
@@ -164,7 +164,7 @@ def_dyn_fn(flt_div) //div(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//flt(self/x)
-	return create_flt(get_flt_val(SELF)/get_flt_val(get_arg(1)));
+	return create_flt(get_flt_val(SELF)/get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_mod) //mod(self,x)
@@ -173,7 +173,7 @@ def_dyn_fn(flt_mod) //mod(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//flt(self%operand)
-	return create_flt(fmod(get_flt_val(SELF),get_flt_val(get_arg(1))));
+	return create_flt(fmod(get_flt_val(SELF),get_flt_val(args[1])));
 }
 
 def_dyn_fn(flt_hash)
@@ -191,7 +191,7 @@ def_dyn_fn(flt_eq) //eq(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//flt(self==x)
-	return create_bool(get_flt_val(SELF)==get_flt_val(get_arg(1)));
+	return create_bool(get_flt_val(SELF)==get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_lt) //lt(self,x)
@@ -200,7 +200,7 @@ def_dyn_fn(flt_lt) //lt(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//flt(self<x)
-	return create_bool(get_flt_val(SELF)<get_flt_val(get_arg(1)));
+	return create_bool(get_flt_val(SELF)<get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_le) //le(self,x)
@@ -209,7 +209,7 @@ def_dyn_fn(flt_le) //le(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//bool(self<=x)
-	return create_bool(get_flt_val(SELF)<=get_flt_val(get_arg(1)));
+	return create_bool(get_flt_val(SELF)<=get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_gt) //qt(self,x)
@@ -218,7 +218,7 @@ def_dyn_fn(flt_gt) //qt(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//bool(self>x)
-	return create_bool(get_flt_val(SELF)>get_flt_val(get_arg(1)));
+	return create_bool(get_flt_val(SELF)>get_flt_val(args[1]));
 }
 
 def_dyn_fn(flt_ge) //ge(self,x)
@@ -227,5 +227,5 @@ def_dyn_fn(flt_ge) //ge(self,x)
 		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
 	#endif
 	//bool(self>=x)
-	return create_bool(get_flt_val(SELF)>=get_flt_val(get_arg(1)));
+	return create_bool(get_flt_val(SELF)>=get_flt_val(args[1]));
 }

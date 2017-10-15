@@ -67,5 +67,5 @@ def_dyn_fn(global_print)
 	#ifdef DEBUG
 		arg_guard(2,2,protect({"self","str"}),protect({GLOBAL,STR}));
 	#endif
-	printf("%s",*get_str_val(get_arg(1))->raw);
+	printf("%s",*get_str_val(args[1])->raw);
 }
