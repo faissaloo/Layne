@@ -109,9 +109,11 @@ void hash_table_remove(struct hash_table *self, void *key)
 {
 	hash_t key_hash;
 	key_hash=(self->hash_func)(key);
-	if ((*(self->items))[key_hash%self->table_size]->filled==0)
+	unsigned int index;
+	index=key_hash%self->table_size;
+	if ((*(self->items))[index]->filled==0)
 	{
-		(*(self->items))[key_hash%self->table_size]=NULL;
+		(*(self->items))[index]=NULL;
 		if (--self->table_filled < self->table_size-block_size)
 		{
 			hash_table_shrink(self);
@@ -119,12 +121,11 @@ void hash_table_remove(struct hash_table *self, void *key)
 	}
 	else
 	{
-		for (iter_t i=0;i < (*(self->items))[key_hash%self->table_size]->filled;i++)
+		for (iter_t i=0;i < (*(self->items))[index]->filled;i++)
 		{
-			if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get((*(self->items))[key_hash%self->table_size],i))->key,key))
+			if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get((*(self->items))[index],i))->key,key))
 			{
-		//free(dyn_array_get((*(self->items))[hash_string(key)%self->table_size],i));
-				dyn_array_remove((*(self->items))[key_hash%self->table_size],i);
+				dyn_array_remove((*(self->items))[index],i);
 			}
 		}
 	}
@@ -141,24 +142,26 @@ void hash_table_add(struct hash_table *self, void *key, void *data)
 	new_item->key_hash=(self->hash_func)(key);
 	new_item->key=key;
 	new_item->data=data;
-	if ((*(self->items))[new_item->key_hash%self->table_size]==NULL)
+	unsigned int index;
+	index=new_item->key_hash%self->table_size;
+	if ((*(self->items))[index]==NULL)
 	{
-		(*(self->items))[new_item->key_hash%self->table_size]=dyn_array_create();
+		(*(self->items))[index]=dyn_array_create();
 	}
 	else
 	{
 		//Overwrite if this item already exists
-		for (iter_t i=0;i < (*(self->items))[(self->hash_func)(key)%self->table_size]->filled;i++)
+		for (iter_t i=0;i < (*(self->items))[index]->filled;i++)
 		{
-			if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get((*(self->items))[(self->hash_func)(key)%self->table_size],i))->key,key))
+			if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get((*(self->items))[index],i))->key,key))
 			{
-				dyn_array_set((*(self->items))[(self->hash_func)(key)%self->table_size],i,new_item);
+				dyn_array_set((*(self->items))[index],i,new_item);
 				return;
 			}
 		}
 	}
 	//If we didn't find an already existing item with the hash
-	dyn_array_append((*(self->items))[new_item->key_hash%self->table_size],new_item);
+	dyn_array_append((*(self->items))[index],new_item);
 }
 
 void *hash_table_get(struct hash_table *self, void *key)
@@ -178,14 +181,3 @@ void *hash_table_get(struct hash_table *self, void *key)
 	}
 	return NULL;
 }
-
-//Testing stuff
-/*
-int main()
-{
-	struct hash_table *dict=hash_table_create();
-	hash_table_add(dict,"ab",puts);
-	hash_table_add(dict,"ba",printf);
-	((void (*)(void *,void *))hash_table_get(dict,"ba"))("%s","Lol");
-}
-*/
