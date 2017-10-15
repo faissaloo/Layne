@@ -185,7 +185,10 @@ struct dyn_obj* call_function(struct dyn_obj *object_to_call, size_t arg_count, 
 bool is_child(struct dyn_obj *obj,enum type type_id);
 void reg_destructor(struct dyn_obj *obj);
 
-extern struct dyn_obj *global;
+extern struct dyn_obj *kw_global;
+extern struct dyn_obj *kw_true;
+extern struct dyn_obj *kw_false;
+extern struct dyn_obj *kw_none;
 extern struct dyn_obj *type_factory;
 extern struct dyn_obj *int_factory;
 extern struct dyn_obj *flt_factory;

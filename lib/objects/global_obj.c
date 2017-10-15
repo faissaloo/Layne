@@ -29,7 +29,10 @@
 #include "none_obj.h"
 #include "debug.h"
 
-struct dyn_obj *global;
+struct dyn_obj *kw_global;
+struct dyn_obj *kw_true;
+struct dyn_obj *kw_false;
+struct dyn_obj *kw_none;
 struct dyn_obj *type_factory;
 struct dyn_obj *int_factory;
 struct dyn_obj *flt_factory;
@@ -42,7 +45,7 @@ struct method_list factory_global_methods={1,{"print",factory_global_print}};
 struct dyn_obj* create_global()
 {
 	obj_setup_basic(GLOBAL);
-	global=self;
+	kw_global=self;
 	type_factory=create_type_factory();
 	bool_factory=create_bool_factory();
 	int_factory=create_int_factory();
@@ -53,6 +56,9 @@ struct dyn_obj* create_global()
 	bind_member(self,"flt",flt_factory);
 	bind_member(self,"bool",bool_factory);
 	bind_member(self,"str",str_factory);
+	kw_true=create_bool(1);
+	kw_false=create_bool(0);
+	kw_none=create_none();
 	return self;
 }
 

@@ -45,8 +45,8 @@ struct dyn_obj *create_type_factory()
 	//global object can't give itself a parent that doesn't yet exist
 	//until we have a cleaner solution we'll tell it what its parent is
 	//We're kinda jerks
-	bind_member(global,"parent",self);
-	bind_member(global,"type",self);
+	bind_member(kw_global,"parent",self);
+	bind_member(kw_global,"type",self);
 
 	return self;
 }

@@ -526,6 +526,14 @@ class retStatement(unaryOp):
 	def C(self):
 		return "return "+self.operand.C()+";"
 
+class keyword():
+	def __init__(self,name):
+		self.name=name
+	def __repr__(self):
+		return self.name
+	def C(self):
+		return "kw_"+self.name
+
 #Meaning depends on context, in an expression it is a comparison
 #in a function declaration it's a default, otherwise it's an
 #assignment
@@ -612,7 +620,7 @@ class blockExpr(list):
 		return "{\n"+("\n".join([str(i) for i in self.tree]))+"\n}"
 
 	def C(self):
-		return "{\n"+("\n".join([i.C()+";" for i in self.tree]))+"\n}"
+		return "{\n"+("\n".join([i.C()+";\n" for i in self.tree]))+"\n}"
 
 class parenthTok(list):
 	pass
@@ -870,7 +878,7 @@ class ast():
 		self.cursor-=1
 
 	def C(self):
-		return ''.join([i.C()+";" for i in self])
+		return ''.join([i.C()+";\n" for i in self])
 
 #Parses a parenthesis layer (including the root)
 def parseLayer(tokens,noAssign=False):
@@ -889,7 +897,9 @@ def parseLayer(tokens,noAssign=False):
 	for i in tree:
 		if type(i) is tuple:
 			if i[0]=="id":
-				if i[1] not in ["from","and","or","not","if","obj","fn","ret","for","while","import","else"]:
+				if i[1] in ["global","true","false"]:
+					tree.consumeItem(keyword)
+				elif i[1] not in ["from","and","or","not","if","obj","fn","ret","for","while","import","else"]:
 					tree.consumeItem(variable)
 	for i in tree:
 		if type(i) is tuple:
@@ -1360,7 +1370,7 @@ class declGen():
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\tstruct dyn_obj *self = call_method(*type_parent_list['+i[-1].enum+'],"new",arg_count,args);\n\tself->cur_type = '+i[-1].enum+';\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinit_methods(self,type_method_lists[self->cur_type]);\n\treturn self;\n}\n'
 			elif (isinstance(i[-1],funcStatement) and len(i)==1) or (len(i)>1 and isinstance(i[-1],funcStatement) and isinstance(i[-2],funcStatement)): #Top level global functions
 				to_ret+=funcGen(i)
-		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=global;\n"
+		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=kw_global;\n"
 
 		declared_vars={}
 		for i in self.names:
