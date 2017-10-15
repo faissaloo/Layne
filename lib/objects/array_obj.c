@@ -17,6 +17,7 @@
 
 #include <gc.h>
 #include <stdlib.h>
+#include "debug.h"
 #include "dyn_objs.h"
 #include "dyn_arrays.h"
 #include "array_obj.h"
@@ -33,7 +34,7 @@ struct method_list array_methods={
 		method_pair("set",array_set),
 		method_pair("get",array_get),
 		method_pair("ins",array_ins),
-		method_pair("del",array_del),
+		method_pair("rm",array_rm),
 		method_pair("len",array_len),
 		method_pair("str",array_str),
 		method_pair("hash",array_hash)
@@ -49,9 +50,12 @@ struct dyn_obj* create_array(struct dyn_array *ary)
 
 def_dyn_fn(array_new)
 {
-	if (arg_count>1)
+	#ifdef DEBUG
+		arg_guard(0,1,protect({"x"}),protect({TYPE}));
+	#endif
+	if (arg_count>0)
 	{
-		return call_method_noargs(args[1],"array");
+		return call_method_noargs(args[0],"array");
 	}
 	return create_array(NULL);
 }
@@ -59,24 +63,30 @@ def_dyn_fn(array_new)
 //Compares every item in the array
 def_dyn_fn(array_eq)
 {
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","b"}),protect({ARRAY,ARRAY}));
+	#endif
 	if (((struct array_obj*)SELF)->data->filled!=((struct array_obj*)args[1])->data->filled)
 	{
-		return create_bool(false);
+		return kw_false;
 	}
 
 	for (iter_t i=0;i<((struct array_obj*)SELF)->data->filled;i++)
 	{
 		if (!get_bool_val(call_method(dyn_array_get(((struct array_obj*)SELF)->data,i),"eq",1,(struct dyn_obj*[]){dyn_array_get(((struct array_obj*)args[1])->data,i)})))
 		{
-			return create_bool(false);
+			return kw_false;
 		}
 	}
-	return create_bool(true);
+	return kw_true;
 }
 
 //array[x]=y
 def_dyn_fn(array_set)
 {
+	#ifdef DEBUG
+		arg_guard(3,3,protect({"self","index","src"}),protect({ARRAY,INT,TYPE}));
+	#endif
 	dyn_array_set(((struct array_obj*)SELF)->data,get_int_val(args[1]),args[2]);
 	return create_none();
 }
@@ -95,23 +105,35 @@ def_dyn_fn(array_get)
 
 def_dyn_fn(array_ins)
 {
+	#ifdef DEBUG
+		arg_guard(3,3,protect({"self","index","src"}),protect({ARRAY,INT,TYPE}));
+	#endif
 	dyn_array_insert(((struct array_obj*)SELF)->data,get_int_val(args[1]),args[2]);
-	return create_none();
+	return kw_none;
 }
 
-def_dyn_fn(array_del)
+def_dyn_fn(array_rm)
 {
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","index"}),protect({ARRAY,INT}));
+	#endif
 	dyn_array_remove(((struct array_obj*)SELF)->data,get_int_val(args[1]));
-	return create_none();
+	return kw_none;
 }
 
 def_dyn_fn(array_len)
 {
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({ARRAY}));
+	#endif
 	return create_int(((struct array_obj*)SELF)->data->filled);
 }
 
 def_dyn_fn(array_str)
 {
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({ARRAY}));
+	#endif
 	struct dyn_str *new_str;
 	new_str=dyn_str_from_cstr("[");
 
@@ -132,6 +154,9 @@ def_dyn_fn(array_str)
 
 def_dyn_fn(array_hash)
 {
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({ARRAY}));
+	#endif
 	hash_t hash;
 	hash=0;
 	for (iter_t i=0;i<((struct array_obj*)SELF)->data->filled;i++)
