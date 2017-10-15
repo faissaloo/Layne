@@ -38,7 +38,7 @@ struct dyn_obj* factory_##name(size_t arg_count, struct dyn_obj *args[]);
 #define def_dyn_fn(name) struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[]);\
 struct dyn_obj* factory_##name(size_t arg_count, struct dyn_obj *args[])\
 {\
-	return name(arg_count-1,args+sizeof(struct dyn_obj*));\
+	return name(arg_count-1,&args[1]);\
 }\
 struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[])
 

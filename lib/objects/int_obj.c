@@ -84,13 +84,13 @@ struct dyn_obj* create_int(int value)
 def_dyn_fn(int_new)
 {
 	#ifdef DEBUG
-		arg_guard(1,2,protect({"self","x"}),protect({INT,TYPE}));
+		arg_guard(0,1,protect({"x"}),protect({INT}));
 	#endif
 
 	//Value to create the int from
 	if (arg_count>1)
 	{
-		return call_method_noargs(args[1],"int");
+		return call_method_noargs(args[0],"int");
 	}
 	return create_int(0);
 }

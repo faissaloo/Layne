@@ -1365,9 +1365,16 @@ class declGen():
 						to_ret+=funcGen(ii)
 
 				if i[-1].new:
-					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(i[-1].new[-1].minLen()-1)+','+str(i[-1].new[-1].maxLen()-1)+',protect({'+(''.join(['"'+str(ii.var)+'",' for ii in i[-1].new[-1].param]))+'}),protect({'+(','.join([("((struct factory_obj*)"+str(ii.type.C())+")->type_to_create") if ii.type else "TYPE" for ii in i[-1].new[-1].param]))+'}));\n\t#endif\n\tobject_setup('+i[-1].enum+');\n\t'+i[-1].new[-1].code.C()+'\n}\n'
+					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(i[-1].new[-1].minLen()-1)+','+str(i[-1].new[-1].maxLen()-1)+',protect({'+(''.join(['"'+str(ii.var)+'",' for ii in i[-1].new[-1].param]))+'}),protect({'+(','.join([("((struct factory_obj*)"+str(ii.type.C())+")->type_to_create") if ii.type else "TYPE" for ii in i[-1].new[-1].param]))+'}));\n\t#endif\n\tobject_setup('+i[-1].enum+');\n\t'
+					for ii,j in enumerate(i[-1].new[-1].param):
+						if j.default:
+							to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args->filled>='+str(iii)+'?args['+str(ii)+']:'+j.default.C()+';\n'
+						else:
+							to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args['+str(ii)+'];\n'
+					to_ret+=i[-1].new[-1].code.C()+'\n}\n'
 				else:
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\tstruct dyn_obj *self = call_method(*type_parent_list['+i[-1].enum+'],"new",arg_count,args);\n\tself->cur_type = '+i[-1].enum+';\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinit_methods(self,type_method_lists[self->cur_type]);\n\treturn self;\n}\n'
+
 			elif (isinstance(i[-1],funcStatement) and len(i)==1) or (len(i)>1 and isinstance(i[-1],funcStatement) and isinstance(i[-2],funcStatement)): #Top level global functions
 				to_ret+=funcGen(i)
 		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=kw_global;\n"
