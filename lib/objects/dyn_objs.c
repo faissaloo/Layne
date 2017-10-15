@@ -229,7 +229,7 @@ struct dyn_obj* call_method(struct dyn_obj *obj, char method_name[], size_t arg_
 	*new_args=obj;
 	if (arg_count>0)
 	{
-		memcpy(&new_args[1],args,sizeof(struct dyn_obj*)*arg_count);	
+		memcpy(&new_args[1],args,sizeof(struct dyn_obj*)*arg_count);
 	}
 	return call_function(get_member(obj,method_name),arg_count+1,new_args);
 }
@@ -240,10 +240,25 @@ struct dyn_obj* call_method_noargs(struct dyn_obj *obj, char method_name[])
 	return call_function(get_member(obj,method_name),1,(struct dyn_obj*[]){obj});
 }
 
+//Calls a method which only passes self to the object if it exists
+struct dyn_obj* call_method_noargs_silent(struct dyn_obj *obj, char method_name[])
+{
+	struct dyn_obj *callable;
+	callable=hash_table_get(obj->members,method_name);
+	if (callable)
+	{
+		return call_function(callable,1,(struct dyn_obj*[]){obj});
+	}
+	else
+	{
+		return kw_none;
+	}
+}
+
 //Registers the destructor for the object
 void reg_destructor(struct dyn_obj *obj)
 {
-	GC_register_finalizer(obj,(GC_finalization_proc)call_method_noargs,"del",0,0);
+	GC_register_finalizer(obj,(GC_finalization_proc)call_method_noargs_silent,"del",0,0);
 }
 
 bool is_child(struct dyn_obj *obj,enum type type_id)
