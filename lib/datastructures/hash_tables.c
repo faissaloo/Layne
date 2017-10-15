@@ -100,11 +100,9 @@ void hash_table_shrink(struct hash_table *self)
 			(*(self->items))[((struct hash_table_item*)dyn_array_get((*old_items)[i],0))->key_hash%self->table_size-block_size]=(*old_items)[i];
 		}
 	}
-	//free(old_items);
 	self->table_size-=block_size;
 }
 
-//hash_string, strcmp
 void hash_table_remove(struct hash_table *self, void *key)
 {
 	hash_t key_hash;
