@@ -40,7 +40,7 @@ struct method_list str_methods={
 
 struct dyn_obj *create_str_factory()
 {
-	factory_setup(STR);
+	fact_setup_basic(STR);
 	return self;
 }
 

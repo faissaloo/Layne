@@ -30,7 +30,7 @@
 
 struct dyn_obj *create_flt_factory()
 {
-	factory_setup(FLT);
+	fact_setup_basic(FLT);
 	return self;
 }
 

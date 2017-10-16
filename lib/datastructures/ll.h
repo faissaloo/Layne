@@ -15,33 +15,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <gc.h>
-
-#include "dyn_objs.h"
-#include "none_obj.h"
-#include "factory_obj.h"
-
-struct method_list none_methods={
-	1,
-	{
-		{"new",none_new}
-	}
-};
-
-struct method_list factory_none_methods={
-	1,
-	{
-		{"new",factory_none_new}
-	}
-};
-
-struct dyn_obj* create_none()
+//Linked lists
+struct ll_item
 {
-	obj_setup_basic(NONE);
-	return self;
-}
-
-def_dyn_fn(none_new)
-{
-	return create_none();
-}
+	void *data;
+	struct ll_item *prev;
+	struct ll_item *next;
+};

@@ -65,7 +65,7 @@ struct method_list int_methods={
 };
 struct dyn_obj *create_int_factory()
 {
-	factory_setup(INT);
+	fact_setup_basic(INT);
 	return self;
 }
 

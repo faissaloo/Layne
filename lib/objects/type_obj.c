@@ -53,9 +53,7 @@ struct dyn_obj *create_type_factory()
 
 struct dyn_obj* create_type()
 {
-	object_setup(TYPE);
-	init_methods(self,&type_methods);
-
+	obj_setup_basic(TYPE);
 	return self;
 }
 

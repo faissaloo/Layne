@@ -54,30 +54,46 @@ struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[])
 	bind_member(self,"parent",*type_parent_list[typecode]);\
 	init_methods(self,type_method_lists[typecode]);
 
+#define fact_setup_basic(typecode)\
+	struct dyn_obj *self;\
+	self=GC_MALLOC(type_sizes[FACTORY]);\
+	self->members=hash_table_create(&string_eq,&hash_string);\
+	self->cur_type=FACTORY;\
+	((struct factory_obj*)self)->type_to_create=typecode;\
+	bind_member(self,"parent",*type_parent_list[typecode]);\
+	type_factory_list[((struct factory_obj*)self)->type_to_create]=&self;
+
 //This little function here will go through the 'parents' linked list backwards and apply every method, with ones closer to the object replacing the ones further
-//We're going to be lazy and use an array instead of a linked list to reverse the linked list for now but we should make a linked list type later
 #define object_setup(typecode)\
 	struct dyn_obj *self;\
 	self=GC_MALLOC(type_sizes[typecode]);\
 	self->members=hash_table_create(&string_eq,&hash_string);\
 	self->cur_type=typecode;\
 	bind_member(self,"parent",*type_parent_list[typecode]);\
-	struct dyn_array *temp_array;\
-	temp_array=dyn_array_create();\
+	struct ll_item *cur_item;\
+	cur_item=NULL;\
+	struct ll_item *prev_item;\
 	for (struct dyn_obj *i=self;!(i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==TYPE);i=get_member(i,"parent"))\
 	{\
+		prev_item=cur_item;\
+		cur_item=GC_MALLOC(sizeof(struct ll_item));\
+		if (prev_item)\
+		{\
+			prev_item->next=cur_item;\
+		}\
+		cur_item->prev=prev_item;\
 		if (i->cur_type==FACTORY)\
 		{\
-			dyn_array_append(temp_array,type_method_lists[((struct factory_obj*)i)->type_to_create]);\
+			cur_item->data=type_method_lists[((struct factory_obj*)i)->type_to_create];\
 		}\
 		else\
 		{\
-			dyn_array_append(temp_array,type_method_lists[i->cur_type]);\
+			cur_item->data=type_method_lists[i->cur_type];\
 		}\
 	}\
-	for (iter_t i=0;i<temp_array->filled;i++)\
+	for (;cur_item!=NULL;cur_item=cur_item->prev)\
 	{\
-		init_methods(self,dyn_array_get(temp_array,i));\
+		init_methods(self,(const struct method_list *)cur_item->data);\
 	}\
 	reg_destructor(self);
 
@@ -89,25 +105,32 @@ struct dyn_obj* name(size_t arg_count, struct dyn_obj *args[])
 	((struct factory_obj*)self)->type_to_create=typecode;\
 	bind_member(self,"parent",*type_parent_list[typecode]);\
 	type_factory_list[((struct factory_obj*)self)->type_to_create]=&self;\
-	struct dyn_array *temp_array;\
-	temp_array=dyn_array_create();\
+	struct ll_item *cur_item;\
+	cur_item=NULL;\
+	struct ll_item *prev_item;\
 	for (struct dyn_obj *i=self;!(i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==TYPE);i=get_member(i,"parent"))\
 	{\
+		prev_item=cur_item;\
+		cur_item=GC_MALLOC(sizeof(struct ll_item));\
+		if (prev_item)\
+		{\
+			prev_item->next=cur_item;\
+		}\
+		cur_item->prev=prev_item;\
 		if (i->cur_type==FACTORY)\
 		{\
-			dyn_array_append(temp_array,type_method_lists[((struct factory_obj*)i)->type_to_create]);\
+			cur_item->data=type_method_lists[((struct factory_obj*)i)->type_to_create];\
 			type_sizes[((struct factory_obj*)self)->type_to_create]=max(type_sizes[((struct factory_obj*)self)->type_to_create],type_sizes[((struct factory_obj*)i)->type_to_create]);\
 		}\
 		else\
 		{\
-			dyn_array_append(temp_array,type_method_lists[i->cur_type]);\
+			cur_item->data=type_method_lists[i->cur_type];\
 			type_sizes[((struct factory_obj*)self)->type_to_create]=max(type_sizes[((struct factory_obj*)self)->type_to_create],type_sizes[i->cur_type]);\
 		}\
 	}\
-	\
-	for (iter_t i=0;i<temp_array->filled;i++)\
+	for (;cur_item!=NULL;cur_item=cur_item->prev)\
 	{\
-		init_factory_methods(self,dyn_array_get(temp_array,i));\
+		init_factory_methods(self,(const struct method_list *)cur_item->data);\
 	}
 
 enum type
