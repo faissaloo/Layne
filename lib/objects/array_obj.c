@@ -17,6 +17,7 @@
 
 #include <gc.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "debug.h"
 #include "dyn_objs.h"
 #include "dyn_arrays.h"
