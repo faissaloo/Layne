@@ -24,14 +24,7 @@
 struct method_list none_methods={
 	1,
 	{
-		{"new",none_new}
-	}
-};
-
-struct method_list factory_none_methods={
-	1,
-	{
-		{"new",factory_none_new}
+		method_pair("new",none_new)
 	}
 };
 
