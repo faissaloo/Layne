@@ -685,12 +685,18 @@ class ifStatement(inheritContextStatement):
 		return 'if (get_bool_val(call_method_noargs('+self.expr.C()+',"bool")))\n'+self.code.C()
 
 class forStatement(inheritContextStatement):
-	def __init__(self,iterator,toIterate,code):
-		self.iterator=iterator
-		self.toIterate=toIterate
+	forStatementCount=0
+	def __init__(self,expr,code):
+		self.iterator=expr.operand1
+		self.toIterate=expr.operand2
+		#Name this better some time
+		self.internalIterator="for_loop_internal_iterator"+str(self.forStatementCount)
+		self.forStatementCount+=1
 		self.code=code
 	def __repr__(self):
 		return "FOR "+str(self.iterator)+" IN "+str(self.toIterate)+"\n"+str(self.code)
+	def C(self):
+		return "for (struct dyn_obj *"+self.internalIterator+" = call_method_noargs("+self.toIterate.C()+',"iter"),*'+self.iterator.C()+'=call_method_noargs('+self.internalIterator+',"next");'+self.iterator.C()+"->cur_type != TERM;"+self.iterator.C()+"=call_method_noargs("+self.internalIterator+',"next"))\n'+self.code.C()
 
 class whileStatement(inheritContextStatement):
 	def __init__(self,expr,code):
@@ -1090,8 +1096,8 @@ def parseLayer(tokens,noAssign=False):
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 				elif i[1]=="for":
-					tree.tree.insert(tree.cursor,forStatement(tree[tree.cursor+1],tree[tree.cursor+2],tree[tree.cursor+3]))
-					tree.tree.pop(tree.cursor+1)
+					#This syntax makes 0 sense m800m88
+					tree.tree.insert(tree.cursor,forStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)

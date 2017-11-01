@@ -15,31 +15,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ARRAY_OBJ_H
-#define ARRAY_OBJ_H
+#ifndef LST_ITER_OBJ_H
+#define LST_ITER_OBJ_H
 
 #include "dyn_objs.h"
 #include "type_obj.h"
-#include "dyn_arrays.h"
 
-struct dyn_obj *create_array_factory();
-struct dyn_obj* create_array(struct dyn_array *ary);
-struct array_obj
+struct dyn_obj *create_lst_iter_factory();
+
+struct dyn_obj* create_lst_iter(struct dyn_array *to_iter);
+struct lst_iter_obj
 {
 	struct type_obj parent;
-	struct dyn_array *data;
+	struct dyn_array *to_iter;
+	iter_t index;
 };
 
-extern struct method_list array_methods;
-extern struct method_list factory_array_methods;
-decl_dyn_fn(array_new);
-decl_dyn_fn(array_set);
-decl_dyn_fn(array_ins);
-decl_dyn_fn(array_rm);
-decl_dyn_fn(array_get);
-decl_dyn_fn(array_len);
-decl_dyn_fn(array_eq);
-decl_dyn_fn(array_str);
-decl_dyn_fn(array_hash);
-decl_dyn_fn(array_iter);
+extern struct method_list lst_iter_methods;
+decl_dyn_fn(lst_iter_new);
+decl_dyn_fn(lst_iter_next);
 #endif

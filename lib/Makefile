@@ -1,8 +1,8 @@
 CC:=gcc
 CFLAGS+= -I . -I datastructures -I objects -I parserdata -O3
 
-all: Makefile parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/dict_obj.o objects/array_obj.o
-	$(CC) $(CFLAGS) parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/array_obj.o objects/dict_obj.o -lgc -lm
+all: Makefile parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/dict_obj.o objects/array_obj.o objects/lst_iter_obj.o objects/term_obj.o
+	$(CC) $(CFLAGS) parserdata/main.o utils.o debug.o objects/factory_obj.o objects/global_obj.o objects/bool_obj.o objects/int_obj.o objects/str_obj.o objects/flt_obj.o objects/dyn_objs.o objects/func_obj.o objects/none_obj.o objects/type_obj.o datastructures/dyn_arrays.o datastructures/hash_tables.o datastructures/dyn_str.o objects/array_obj.o objects/dict_obj.o objects/lst_iter_obj.o objects/term_obj.o -lgc -lm
 
 #We need to have it so that if we already have an executable that was compiled without debug mode it should be recompiled entirely but not otherwise
 dbg: CFLAGS+=-DDEBUG -g -pg -Og -rdynamic
@@ -28,6 +28,12 @@ objects/dict_obj.o: objects/dict_obj.c objects/dict_obj.h objects/dyn_objs.h obj
 
 objects/array_obj.o: objects/array_obj.c objects/array_obj.h objects/dyn_objs.h objects/type_obj.h
 	$(CC) $(CFLAGS) -c objects/array_obj.c -o objects/array_obj.o
+
+objects/lst_iter_obj.o: objects/lst_iter_obj.c objects/lst_iter_obj.h objects/dyn_objs.h objects/type_obj.h
+	$(CC) $(CFLAGS) -c objects/lst_iter_obj.c -o objects/lst_iter_obj.o
+
+objects/term_obj.o: objects/term_obj.c objects/term_obj.h objects/dyn_objs.h objects/type_obj.h
+	$(CC) $(CFLAGS) -c objects/term_obj.c -o objects/term_obj.o
 
 objects/bool_obj.o: objects/bool_obj.c objects/bool_obj.h objects/dyn_objs.h objects/type_obj.h
 	$(CC) $(CFLAGS) -c objects/bool_obj.c -o objects/bool_obj.o

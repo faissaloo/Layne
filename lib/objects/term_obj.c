@@ -15,31 +15,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ARRAY_OBJ_H
-#define ARRAY_OBJ_H
+#include <gc.h>
 
 #include "dyn_objs.h"
-#include "type_obj.h"
-#include "dyn_arrays.h"
+#include "term_obj.h"
+#include "factory_obj.h"
 
-struct dyn_obj *create_array_factory();
-struct dyn_obj* create_array(struct dyn_array *ary);
-struct array_obj
-{
-	struct type_obj parent;
-	struct dyn_array *data;
+struct method_list term_methods={
+	1,
+	{
+		method_pair("new",term_new)
+	}
 };
 
-extern struct method_list array_methods;
-extern struct method_list factory_array_methods;
-decl_dyn_fn(array_new);
-decl_dyn_fn(array_set);
-decl_dyn_fn(array_ins);
-decl_dyn_fn(array_rm);
-decl_dyn_fn(array_get);
-decl_dyn_fn(array_len);
-decl_dyn_fn(array_eq);
-decl_dyn_fn(array_str);
-decl_dyn_fn(array_hash);
-decl_dyn_fn(array_iter);
-#endif
+struct dyn_obj* create_term()
+{
+	obj_setup_basic(TERM);
+	return self;
+}
+
+def_dyn_fn(term_new)
+{
+	return create_term();
+}

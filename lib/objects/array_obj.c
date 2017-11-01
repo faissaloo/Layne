@@ -26,10 +26,11 @@
 #include "int_obj.h"
 #include "bool_obj.h"
 #include "factory_obj.h"
+#include "lst_iter_obj.h"
 #include "none_obj.h"
 
 struct method_list array_methods={
-	8,
+	9,
 	{
 		method_pair("new",array_new),
 		method_pair("set",array_set),
@@ -38,7 +39,8 @@ struct method_list array_methods={
 		method_pair("rm",array_rm),
 		method_pair("len",array_len),
 		method_pair("str",array_str),
-		method_pair("hash",array_hash)
+		method_pair("hash",array_hash),
+		method_pair("iter",array_iter)
 	}
 };
 
@@ -166,4 +168,12 @@ def_dyn_fn(array_hash)
 		hash+=get_int_val(call_method_noargs(dyn_array_get(((struct array_obj*)SELF)->data,i),"hash"));
 	}
 	return create_int(hash);
+}
+
+def_dyn_fn(array_iter)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({ARRAY}));
+	#endif
+	return create_lst_iter(((struct array_obj*)SELF)->data);
 }

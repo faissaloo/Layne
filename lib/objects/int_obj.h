@@ -32,7 +32,6 @@ struct int_obj
 };
 
 extern struct method_list int_methods;
-extern struct method_list factory_int_methods;
 decl_dyn_fn(int_new);
 
 decl_dyn_fn(int_int);
