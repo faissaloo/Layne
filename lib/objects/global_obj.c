@@ -46,11 +46,11 @@ struct dyn_obj* create_global()
 {
 	obj_setup_basic(GLOBAL);
 	kw_global=self;
-	type_factory=create_type_factory();
-	bool_factory=create_bool_factory();
-	int_factory=create_int_factory();
-	flt_factory=create_flt_factory();
-	str_factory=create_str_factory();
+	create_type_factory();
+	create_bool_factory();
+	create_int_factory();
+	create_flt_factory();
+	create_str_factory();
 	bind_member(self,"type",type_factory);
 	bind_member(self,"int",int_factory);
 	bind_member(self,"flt",flt_factory);

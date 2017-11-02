@@ -30,7 +30,7 @@ struct method_list factory_func_methods={0,{}};
 struct dyn_obj* create_function(struct dyn_obj* (*function)(size_t arg_count, struct dyn_obj *args[]))
 {
 	obj_setup_basic(FUNCTION);
-
+	bind_member(self,"parent",type_factory);
 	bind_member(self,"call",self);
 	((struct func_obj*)self)->function=function;
 

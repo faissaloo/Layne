@@ -30,7 +30,7 @@
 #include "none_obj.h"
 
 struct method_list array_methods={
-	9,
+	10,
 	{
 		method_pair("new",array_new),
 		method_pair("set",array_set),
@@ -40,7 +40,8 @@ struct method_list array_methods={
 		method_pair("len",array_len),
 		method_pair("str",array_str),
 		method_pair("hash",array_hash),
-		method_pair("iter",array_iter)
+		method_pair("iter",array_iter),
+		method_pair("copy",array_copy)
 	}
 };
 
@@ -61,6 +62,19 @@ def_dyn_fn(array_new)
 		return call_method_noargs(args[0],"array");
 	}
 	return create_array(NULL);
+}
+
+def_dyn_fn(array_copy)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","dest"}),protect({ARRAY,ARRAY}));
+	#endif
+	for (iter_t i=0;i<((struct array_obj*)SELF)->data->filled;i++)
+	{
+		dyn_array_set(((struct array_obj*)args[1])->data,i,copy_obj(dyn_array_get(((struct array_obj*)SELF)->data,i), NULL));
+	}
+	//((struct array_obj*)SELF)->data;
+	return kw_none;
 }
 
 //Compares every item in the array

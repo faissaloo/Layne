@@ -41,6 +41,7 @@ struct method_list str_methods={
 struct dyn_obj *create_str_factory()
 {
 	fact_setup_basic(STR);
+	str_factory=self;
 	return self;
 }
 

@@ -44,6 +44,7 @@ struct method_list bool_methods={
 struct dyn_obj *create_bool_factory()
 {
 	fact_setup_basic(BOOL);
+	bool_factory=self;
 	return self;
 }
 

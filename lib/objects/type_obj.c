@@ -39,7 +39,12 @@ struct method_list factory_type_methods={
 
 struct dyn_obj *create_type_factory()
 {
-	obj_setup_basic(FACTORY);
+	struct dyn_obj *self;
+	self=GC_MALLOC(type_sizes[FACTORY]);
+	self->members=hash_table_create(&string_eq,&hash_string);
+	self->cur_type=FACTORY;
+	type_factory=self;
+	bind_member(self,"parent",*type_parent_list[FACTORY]);
 	init_methods(self,&factory_type_methods);
 
 	//global object can't give itself a parent that doesn't yet exist

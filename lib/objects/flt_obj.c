@@ -31,6 +31,7 @@
 struct dyn_obj *create_flt_factory()
 {
 	fact_setup_basic(FLT);
+	flt_factory=self;
 	return self;
 }
 
