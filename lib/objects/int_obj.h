@@ -69,4 +69,7 @@ decl_dyn_fn(int_neg);
 decl_dyn_fn(int_ineg);
 decl_dyn_fn(int_not);
 decl_dyn_fn(int_inot);
+
+decl_dyn_fn(int_flt);
+decl_dyn_fn(int_bool);
 #endif

@@ -19,6 +19,7 @@
 
 #include "dyn_objs.h"
 #include "int_obj.h"
+#include "flt_obj.h"
 #include "str_obj.h"
 #include "bool_obj.h"
 #include "none_obj.h"
@@ -29,7 +30,7 @@
 struct dyn_obj *global;
 
 struct method_list int_methods={
-	30,
+	32,
 	{
 		method_pair("new",int_new),
 		method_pair("add",int_add),
@@ -60,9 +61,12 @@ struct method_list int_methods={
 		method_pair("not",int_not),
 		method_pair("inot",int_inot),
 		method_pair("mod",int_mod),
-		method_pair("imod",int_imod)
+		method_pair("imod",int_imod),
+		method_pair("flt",int_flt),
+		method_pair("bool",int_bool)
 	}
 };
+
 struct dyn_obj *create_int_factory()
 {
 	fact_setup_basic(INT);
@@ -390,4 +394,12 @@ def_dyn_fn(int_inot)
 	//self=-self
 	((struct int_obj*)SELF)->value=~((struct int_obj*)SELF)->value;
 	return SELF;
+}
+
+def_dyn_fn(int_flt)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({INT}));
+	#endif
+	return create_flt((double)get_int_val(SELF));
 }
