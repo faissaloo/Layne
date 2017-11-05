@@ -33,6 +33,7 @@ struct dyn_str* dyn_str_cut(struct dyn_str *self, int start, int end);
 struct dyn_str* dyn_str_get_char(struct dyn_str *self, int pos);
 struct dyn_str* dyn_str_from_cstr(char str[]);
 struct dyn_str* dyn_str_from_int(int n);
+struct dyn_str* dyn_str_from_float(double n);
 unsigned long int dyn_str_hash(struct dyn_str *self);
 int dyn_str_to_int(struct dyn_str *self);
 bool dyn_str_eq(struct dyn_str *a, struct dyn_str *b);

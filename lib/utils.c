@@ -120,3 +120,8 @@ void int_to_str(int n,char *buff)
 	}
 	while (n!=0);
 }
+
+void float_to_str(double n, char *buff)
+{
+	
+}

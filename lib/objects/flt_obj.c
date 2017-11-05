@@ -41,7 +41,7 @@ double get_flt_val(struct dyn_obj *obj)
 }
 
 struct method_list flt_methods={
-	16,
+	20,
 	{
 		method_pair("new",flt_new),
 		method_pair("add",flt_add),
@@ -49,7 +49,13 @@ struct method_list flt_methods={
 		method_pair("mul",flt_mul),
 		method_pair("div",flt_div),
 		method_pair("mod",flt_mod),
+		method_pair("add",flt_add),
+		method_pair("isub",flt_isub),
+		method_pair("imul",flt_imul),
+		method_pair("idiv",flt_idiv),
+		method_pair("imod",flt_imod),
 		method_pair("int",flt_int),
+		method_pair("bool",flt_bool),
 		method_pair("flt",flt_flt),
 		method_pair("str",flt_str),
 		method_pair("hash",flt_hash),
@@ -107,7 +113,7 @@ def_dyn_fn(flt_str)
 		arg_guard(1,1,protect({"self"}),protect({FLT}));
 	#endif
 
-	return create_str(dyn_str_from_int(get_flt_val(SELF)));
+	return create_str(dyn_str_from_float(get_flt_val(SELF)));
 }
 
 def_dyn_fn(flt_bool)
@@ -175,6 +181,57 @@ def_dyn_fn(flt_mod) //mod(self,x)
 	#endif
 	//flt(self%operand)
 	return create_flt(fmod(get_flt_val(SELF),get_flt_val(args[1])));
+}
+
+def_dyn_fn(flt_iadd) //add(self,operand)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
+	#endif
+
+	//flt(self+x)
+	((struct flt_obj*)SELF)->value+=get_flt_val(args[1]);
+	return SELF;
+}
+
+def_dyn_fn(flt_isub) //sub(self,x)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
+	#endif
+	//flt(self-x)
+	((struct flt_obj*)SELF)->value-=get_flt_val(args[1]);
+	return SELF;
+}
+
+def_dyn_fn(flt_imul) //mul(self,x)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
+	#endif
+	//flt(self*x)
+	((struct flt_obj*)SELF)->value*=get_flt_val(args[1]);
+	return SELF;
+}
+
+def_dyn_fn(flt_idiv) //div(self,x)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
+	#endif
+	//flt(self/x)
+	((struct flt_obj*)SELF)->value=((struct flt_obj*)SELF)->value/get_flt_val(args[1]);
+	return SELF;
+}
+
+def_dyn_fn(flt_imod) //mod(self,x)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","x"}),protect({FLT,FLT}));
+	#endif
+	//flt(self%operand)
+	((struct flt_obj*)SELF)->value=fmod(((struct flt_obj*)SELF)->value,get_flt_val(args[1]));
+	return SELF;
 }
 
 def_dyn_fn(flt_hash)

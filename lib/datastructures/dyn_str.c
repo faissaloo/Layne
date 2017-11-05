@@ -16,6 +16,7 @@
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stddef.h>
+#include <stdio.h>
 #include "dyn_str.h"
 #include "utils.h"
 #include <string.h>
@@ -128,6 +129,20 @@ struct dyn_str* dyn_str_from_int(int n)
 	new_str=dyn_str_create();
 	int_to_str(n,buff);
 	dyn_str_cat_cstr(new_str,buff);
+	return new_str;
+}
+
+//Make a less crap version of this at some point
+//Issues:
+// This depends on the block_size being big enough to reasonably store the float
+// It's using snprintf which is slow as hell
+// It uses strlen to figure out the length even though we could already know this
+struct dyn_str* dyn_str_from_float(double n)
+{
+	struct dyn_str *new_str;
+	new_str=dyn_str_create();
+	snprintf(*new_str->raw,new_str->length,"%f",n);
+	new_str->filled=strlen(*new_str->raw);
 	return new_str;
 }
 

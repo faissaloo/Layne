@@ -45,6 +45,12 @@ decl_dyn_fn(flt_mul);
 decl_dyn_fn(flt_div);
 decl_dyn_fn(flt_mod);
 
+decl_dyn_fn(flt_iadd);
+decl_dyn_fn(flt_isub);
+decl_dyn_fn(flt_imul);
+decl_dyn_fn(flt_idiv);
+decl_dyn_fn(flt_imod);
+
 decl_dyn_fn(flt_eq);
 decl_dyn_fn(flt_lt);
 decl_dyn_fn(flt_le);
