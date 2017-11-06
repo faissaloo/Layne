@@ -31,4 +31,6 @@ extern struct method_list none_methods;
 extern struct method_list factory_none_methods;
 decl_dyn_fn(none_new);
 
+decl_dyn_fn(none_bool);
+decl_dyn_fn(none_str);
 #endif

@@ -19,12 +19,16 @@
 
 #include "dyn_objs.h"
 #include "none_obj.h"
+#include "bool_obj.h"
+#include "str_obj.h"
 #include "factory_obj.h"
 
 struct method_list none_methods={
-	1,
+	3,
 	{
-		method_pair("new",none_new)
+		method_pair("new",none_new),
+		method_pair("bool",none_bool),
+		method_pair("str",none_str),
 	}
 };
 
@@ -36,5 +40,24 @@ struct dyn_obj* create_none()
 
 def_dyn_fn(none_new)
 {
+	#ifdef DEBUG
+		arg_guard(0,0,protect({}),protect({}));
+	#endif
 	return create_none();
+}
+
+def_dyn_fn(none_bool)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({BOOL}));
+	#endif
+	return create_bool(false);
+}
+
+def_dyn_fn(none_str)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({BOOL}));
+	#endif
+	return create_str(dyn_str_from_cstr("none"));
 }
