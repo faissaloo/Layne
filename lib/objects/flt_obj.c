@@ -41,7 +41,7 @@ double get_flt_val(struct dyn_obj *obj)
 }
 
 struct method_list flt_methods={
-	20,
+	21,
 	{
 		method_pair("new",flt_new),
 		method_pair("add",flt_add),
