@@ -15,38 +15,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef STR_OBJ_H
-#define STR_OBJ_H
+#ifndef STR_ITER_OBJ_H
+#define STR_ITER_OBJ_H
 
-#include <stdbool.h>
-
-#include "dyn_str.h"
 #include "dyn_objs.h"
 #include "type_obj.h"
 
-struct dyn_obj *create_str_factory();
-struct dyn_obj* create_str(struct dyn_str *data);
-struct str_obj
+struct dyn_obj *create_str_iter_factory();
+
+struct dyn_obj* create_str_iter(struct dyn_str *to_iter);
+struct str_iter_obj
 {
 	struct type_obj parent;
-	struct dyn_str *data;
+	struct dyn_str *to_iter;
+	iter_t index;
 };
 
-extern struct method_list str_methods;
-extern struct method_list factory_str_methods;
-decl_dyn_fn(str_new);
-decl_dyn_fn(str_add);
-decl_dyn_fn(str_iadd);
-decl_dyn_fn(str_cut);
-decl_dyn_fn(str_hash);
-decl_dyn_fn(str_int);
-decl_dyn_fn(str_flt);
-decl_dyn_fn(str_str);
-decl_dyn_fn(str_get);
-decl_dyn_fn(str_eq);
-decl_dyn_fn(str_copy);
-decl_dyn_fn(str_lst);
-decl_dyn_fn(str_iter);
-
-struct dyn_str* get_str_val(struct dyn_obj *obj);
+extern struct method_list str_iter_methods;
+decl_dyn_fn(str_iter_new);
+decl_dyn_fn(str_iter_next);
 #endif

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include "debug.h"
 #include "dyn_objs.h"
+#include "str_iter_obj.h"
 #include "str_obj.h"
 #include "int_obj.h"
 #include "flt_obj.h"
@@ -28,7 +29,7 @@
 #include "factory_obj.h"
 
 struct method_list str_methods={
-	12,
+	13,
 	{
 		method_pair("new",str_new),
 		method_pair("add",str_add),
@@ -41,7 +42,8 @@ struct method_list str_methods={
 		method_pair("get",str_get),
 		method_pair("eq",str_eq),
 		method_pair("copy",str_copy),
-		method_pair("lst",str_lst)
+		method_pair("lst",str_lst),
+		method_pair("iter",str_iter)
 	}
 };
 
@@ -150,4 +152,12 @@ def_dyn_fn(str_lst)
 		dyn_array_append(char_lst,create_str(dyn_str_get_char(((struct str_obj*)SELF)->data,i)));
 	}
 	return create_array(char_lst);
+}
+
+def_dyn_fn(str_iter)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({STR}));
+	#endif
+	return create_str_iter(((struct str_obj*)SELF)->data);
 }

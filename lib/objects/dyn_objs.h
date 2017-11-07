@@ -147,7 +147,8 @@ enum type
 	ARRAY,
 	DICT,
 	TERM,
-	LST_ITER
+	LST_ITER,
+	STR_ITER
 	#include "obj_enums.txt"
 };
 

@@ -37,6 +37,7 @@
 #include "func_obj.h"
 #include "factory_obj.h"
 #include "lst_iter_obj.h"
+#include "str_iter_obj.h"
 #include "term_obj.h"
 #include "main.h"
 
@@ -53,7 +54,8 @@ const char *type_names[]={
 	"array",
 	"dict",
 	"term",
-	"lst_iter"
+	"lst_iter",
+	"str_iter"
 	#include "obj_names.txt"
 };
 
@@ -71,6 +73,7 @@ size_t type_sizes[]={
 	sizeof(struct dict_obj),
 	sizeof(struct term_obj),
 	sizeof(struct lst_iter_obj),
+	sizeof(struct str_iter_obj),
 	#include "obj_sizes.txt"
 };
 
@@ -89,7 +92,8 @@ struct method_list *type_method_lists[]={
 	&array_methods,
 	&dict_methods,
 	&term_methods,
-	&lst_iter_methods
+	&lst_iter_methods,
+	&str_iter_methods
 	#include "obj_method_list_refs.txt"
 };
 
@@ -106,7 +110,8 @@ struct dyn_obj **type_factory_list[]={
 	NULL, //Unimplemeted (array)
 	NULL, //Unimplemented (dict)
 	NULL, //Unimplemented (term)
-	NULL //Unimplemented (lst_iter)
+	NULL, //Unimplemented (lst_iter)
+	NULL //Unimplemented (str_iter)
 	#include "obj_type_factory_list_refs.txt"
 };
 
@@ -124,6 +129,7 @@ struct dyn_obj **type_parent_list[]={
 	&type_factory, //Dict
 	&type_factory, //term
 	&type_factory, //lst_iter
+	&type_factory, //str_iter
 	#include "obj_type_parent_refs.txt"
 };
 
