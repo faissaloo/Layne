@@ -36,5 +36,6 @@ struct dyn_str* dyn_str_from_int(int n);
 struct dyn_str* dyn_str_from_float(double n);
 unsigned long int dyn_str_hash(struct dyn_str *self);
 int dyn_str_to_int(struct dyn_str *self);
+double dyn_str_to_double(struct dyn_str *self);
 bool dyn_str_eq(struct dyn_str *a, struct dyn_str *b);
 #endif

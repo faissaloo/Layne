@@ -152,6 +152,12 @@ int dyn_str_to_int(struct dyn_str *self)
 	return strtol(*self->raw,&end,0);
 }
 
+double dyn_str_to_double(struct dyn_str *self)
+{
+	char *end;
+	return strtod(*self->raw,&end);
+}
+
 hash_t dyn_str_hash(struct dyn_str *self)
 {
 	hash_t hash;

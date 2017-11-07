@@ -40,6 +40,7 @@ decl_dyn_fn(str_iadd);
 decl_dyn_fn(str_cut);
 decl_dyn_fn(str_hash);
 decl_dyn_fn(str_int);
+decl_dyn_fn(str_flt);
 decl_dyn_fn(str_str);
 decl_dyn_fn(str_get);
 decl_dyn_fn(str_eq);

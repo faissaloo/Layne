@@ -20,11 +20,12 @@
 #include "dyn_objs.h"
 #include "str_obj.h"
 #include "int_obj.h"
+#include "flt_obj.h"
 #include "bool_obj.h"
 #include "factory_obj.h"
 
 struct method_list str_methods={
-	9,
+	10,
 	{
 		method_pair("new",str_new),
 		method_pair("add",str_add),
@@ -32,6 +33,7 @@ struct method_list str_methods={
 		method_pair("cut",str_cut),
 		method_pair("hash",str_hash),
 		method_pair("int",str_int),
+		method_pair("flt",str_flt),
 		method_pair("str",str_str),
 		method_pair("get",str_get),
 		method_pair("eq",str_eq)
@@ -108,8 +110,12 @@ def_dyn_fn(str_hash)
 
 def_dyn_fn(str_int)
 {
-	//The dyn_str library should have a to integer function
 	return create_int(dyn_str_to_int(get_str_val(SELF)));
+}
+
+def_dyn_fn(str_flt)
+{
+	return create_flt(dyn_str_to_double(get_str_val(SELF)));
 }
 
 def_dyn_fn(str_str)
