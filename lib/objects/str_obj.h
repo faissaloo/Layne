@@ -44,6 +44,7 @@ decl_dyn_fn(str_flt);
 decl_dyn_fn(str_str);
 decl_dyn_fn(str_get);
 decl_dyn_fn(str_eq);
+decl_dyn_fn(str_copy);
 
 struct dyn_str* get_str_val(struct dyn_obj *obj);
 #endif

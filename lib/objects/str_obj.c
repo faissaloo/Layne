@@ -17,6 +17,8 @@
 
 #include <gc.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "debug.h"
 #include "dyn_objs.h"
 #include "str_obj.h"
 #include "int_obj.h"
@@ -25,7 +27,7 @@
 #include "factory_obj.h"
 
 struct method_list str_methods={
-	10,
+	11,
 	{
 		method_pair("new",str_new),
 		method_pair("add",str_add),
@@ -36,7 +38,8 @@ struct method_list str_methods={
 		method_pair("flt",str_flt),
 		method_pair("str",str_str),
 		method_pair("get",str_get),
-		method_pair("eq",str_eq)
+		method_pair("eq",str_eq),
+		method_pair("copy",str_copy)
 	}
 };
 
@@ -121,4 +124,14 @@ def_dyn_fn(str_flt)
 def_dyn_fn(str_str)
 {
 	return create_str(get_str_val(SELF));
+}
+
+def_dyn_fn(str_copy) //copy(self,new_obj)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","dest"}),protect({STR,STR}));
+	#endif
+
+	((struct str_obj*)args[1])->data=dyn_str_copy(((struct str_obj*)SELF)->data);
+	return kw_none;
 }

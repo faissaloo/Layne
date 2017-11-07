@@ -127,7 +127,6 @@ def_dyn_fn(int_bool)
 	return create_bool(get_int_val(SELF));
 }
 
-//Normal operations will create new objects, while in place stuff like += will modify an existing object
 def_dyn_fn(int_copy) //copy(self,new_obj)
 {
 	#ifdef DEBUG

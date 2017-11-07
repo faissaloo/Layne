@@ -96,6 +96,19 @@ struct dyn_str* dyn_str_cut(struct dyn_str *self, int start, int end)
 	return new_str;
 }
 
+struct dyn_str* dyn_str_copy(struct dyn_str *self)
+{
+	struct dyn_str *new_str;
+	new_str=dyn_str_create();
+
+	new_str->filled=self->filled;
+	new_str->length=self->length;
+	new_str->raw=GC_MALLOC(sizeof(char)*new_str->length);
+
+	memcpy(*new_str->raw,*self->raw,new_str->filled*sizeof(char));
+	return new_str;
+}
+
 struct dyn_str* dyn_str_get_char(struct dyn_str *self, int pos)
 {
 	//Returns a new string pointing to the particular character in the string so strings can be mutable
