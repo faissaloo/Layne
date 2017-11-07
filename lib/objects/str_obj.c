@@ -24,10 +24,11 @@
 #include "int_obj.h"
 #include "flt_obj.h"
 #include "bool_obj.h"
+#include "array_obj.h"
 #include "factory_obj.h"
 
 struct method_list str_methods={
-	11,
+	12,
 	{
 		method_pair("new",str_new),
 		method_pair("add",str_add),
@@ -39,7 +40,8 @@ struct method_list str_methods={
 		method_pair("str",str_str),
 		method_pair("get",str_get),
 		method_pair("eq",str_eq),
-		method_pair("copy",str_copy)
+		method_pair("copy",str_copy),
+		method_pair("lst",str_lst)
 	}
 };
 
@@ -134,4 +136,18 @@ def_dyn_fn(str_copy) //copy(self,new_obj)
 
 	((struct str_obj*)args[1])->data=dyn_str_copy(((struct str_obj*)SELF)->data);
 	return kw_none;
+}
+
+def_dyn_fn(str_lst)
+{
+	#ifdef DEBUG
+		arg_guard(1,1,protect({"self"}),protect({STR}));
+	#endif
+	struct dyn_array *char_lst;
+	char_lst=dyn_array_create();
+	for (iter_t i=0;i<((struct str_obj*)SELF)->data->filled;i++)
+	{
+		dyn_array_append(char_lst,create_str(dyn_str_get_char(((struct str_obj*)SELF)->data,i)));
+	}
+	return create_array(char_lst);
 }

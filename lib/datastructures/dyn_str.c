@@ -118,8 +118,8 @@ struct dyn_str* dyn_str_get_char(struct dyn_str *self, int pos)
 	{
 		pos=self->filled-pos;
 	}
-	new_str->length=2*block_size;
-	new_str->raw=GC_MALLOC((sizeof(char)*2)*block_size);
+	new_str->length=block_size;
+	new_str->raw=GC_MALLOC(block_size);
 	new_str->filled=1;
 	memcpy(*(new_str->raw),*(self->raw)+(sizeof(char)*pos),sizeof(char));
 	(*(new_str->raw))[1]='\0';

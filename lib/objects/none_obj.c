@@ -16,7 +16,9 @@
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gc.h>
+#include <stdio.h>
 
+#include "debug.h"
 #include "dyn_objs.h"
 #include "none_obj.h"
 #include "bool_obj.h"
