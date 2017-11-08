@@ -69,5 +69,5 @@ def_dyn_fn(type_new)
 
 def_dyn_fn(type_copy)
 {
-	return create_none();
+	return kw_none;
 }

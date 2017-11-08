@@ -208,6 +208,7 @@ struct dyn_obj* call_method_noargs(struct dyn_obj *obj, char method_name[]);
 struct dyn_obj* call_function(struct dyn_obj *object_to_call, size_t arg_count, struct dyn_obj *args[]);
 bool is_child(struct dyn_obj *obj,enum type type_id);
 void reg_destructor(struct dyn_obj *obj);
+struct dyn_obj* p_bool(int input);
 
 extern struct dyn_obj *kw_global;
 extern struct dyn_obj *kw_true;

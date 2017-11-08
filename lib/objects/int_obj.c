@@ -124,7 +124,7 @@ def_dyn_fn(int_bool)
 		arg_guard(1,1,protect({"self"}),protect({INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF));
+	return p_bool(get_int_val(SELF));
 }
 
 def_dyn_fn(int_copy) //copy(self,new_obj)
@@ -135,7 +135,7 @@ def_dyn_fn(int_copy) //copy(self,new_obj)
 
 	//new_obj.function=self.function
 	((struct int_obj*)args[1])->value=get_int_val(SELF);
-	return create_none();
+	return kw_none;
 }
 
 def_dyn_fn(int_add) //add(self,x)
@@ -257,7 +257,7 @@ def_dyn_fn(int_eq)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)==get_int_val(args[1]));
+	return p_bool(get_int_val(SELF)==get_int_val(args[1]));
 }
 
 def_dyn_fn(int_lt)
@@ -265,7 +265,7 @@ def_dyn_fn(int_lt)
 	#ifdef DEBUG
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
-	return create_bool(get_int_val(SELF)<get_int_val(args[1]));
+	return p_bool(get_int_val(SELF)<get_int_val(args[1]));
 }
 
 def_dyn_fn(int_le)
@@ -274,7 +274,7 @@ def_dyn_fn(int_le)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)<=get_int_val(args[1]));
+	return p_bool(get_int_val(SELF)<=get_int_val(args[1]));
 }
 
 def_dyn_fn(int_gt)
@@ -283,7 +283,7 @@ def_dyn_fn(int_gt)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)>get_int_val(args[1]));
+	return p_bool(get_int_val(SELF)>get_int_val(args[1]));
 }
 
 def_dyn_fn(int_ge)
@@ -292,7 +292,7 @@ def_dyn_fn(int_ge)
 		arg_guard(2,2,protect({"self","x"}),protect({INT,INT}));
 	#endif
 
-	return create_bool(get_int_val(SELF)>=get_int_val(args[1]));
+	return p_bool(get_int_val(SELF)>=get_int_val(args[1]));
 }
 
 def_dyn_fn(int_and)

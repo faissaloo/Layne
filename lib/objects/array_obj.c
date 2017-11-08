@@ -105,7 +105,7 @@ def_dyn_fn(array_set)
 		arg_guard(3,3,protect({"self","index","src"}),protect({ARRAY,INT,TYPE}));
 	#endif
 	dyn_array_set(((struct array_obj*)SELF)->data,get_int_val(args[1]),args[2]);
-	return create_none();
+	return kw_none;
 }
 //Array[x]
 def_dyn_fn(array_get)

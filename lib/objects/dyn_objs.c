@@ -144,6 +144,11 @@ void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)
 	bind_member(obj, method_name, create_function(cfunc));
 }
 
+//Returns one of the pooled boolean objects
+struct dyn_obj* p_bool(int input)
+{
+	return input?kw_true:kw_false;
+}
 struct dyn_obj* get_member(struct dyn_obj *obj,char member_name[])
 {
 	void *member;

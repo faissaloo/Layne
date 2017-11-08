@@ -75,7 +75,7 @@ def_dyn_fn(dict_new)
 def_dyn_fn(dict_set)
 {
 	hash_table_add(((struct dict_obj*)SELF)->data,args[1],args[2]);
-	return create_none();
+	return kw_none;
 }
 
 def_dyn_fn(dict_get)

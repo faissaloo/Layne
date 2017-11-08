@@ -74,7 +74,7 @@ struct dyn_obj* create_str(struct dyn_str *data)
 
 def_dyn_fn(str_eq)
 {
-	return create_bool(dyn_str_eq(get_str_val(SELF),get_str_val(args[1])));
+	return p_bool(dyn_str_eq(get_str_val(SELF),get_str_val(args[1])));
 }
 
 def_dyn_fn(str_new)

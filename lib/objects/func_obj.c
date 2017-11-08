@@ -52,5 +52,5 @@ def_dyn_fn(func_copy) //copy(self,new_obj)
 		arg_guard(2,2,protect({"self","dest"}),protect({FUNCTION,FUNCTION}));
 	#endif
 	((struct func_obj*)args[1])->function=((struct func_obj*)SELF)->function;
-	return create_none();
+	return kw_none;
 }

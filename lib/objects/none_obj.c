@@ -53,7 +53,7 @@ def_dyn_fn(none_bool)
 	#ifdef DEBUG
 		arg_guard(1,1,protect({"self"}),protect({BOOL}));
 	#endif
-	return create_bool(false);
+	return kw_false;
 }
 
 def_dyn_fn(none_str)
