@@ -393,7 +393,8 @@ class copyOp(unaryOp):
 	def __repr__(self):
 		return "@ "+self.operand.__repr__()
 	def C(self):
-		return 'call_method_noargs('+self.operand.C()+',"copy")'
+		return 'copy_obj('+self.operand.C()+',NULL)'
+		#return 'call_method_noargs('+self.operand.C()+',"copy")'
 
 class unaryAssignment(unaryOp):
 	pass
@@ -435,6 +436,14 @@ class dictItemOp(dyadicOp):
 class copyAssign(assignment):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" @= "+self.operand2.__repr__()+")"
+	def C(self):
+		if isinstance(self.operand1,arrayIndex):
+			return 'call_method('+self.operand1.lstExpr.C()+',"set",'+str(len(self.operand1.brackExpr)+1)+',(struct dyn_obj*[]){'+(",".join([i.C() for i in self.operand1.brackExpr])) +",copy_obj("+self.operand2.C()+',NULL)})'
+		elif isinstance(self.operand1,dotOp):
+			return 'bind_member('+self.operand1.operand1.C()+',"'+self.operand1.operand2.C()+'",copy_obj('+self.operand2.C()+',NULL))'
+		else:
+			return self.operand1.C()+' = copy_obj('+self.operand2.C()+",NULL);"
+		#return self.operand1.C()+" = copy_obj("+self.operand2.C()+",NULL)"
 
 class addAssign(assignment):
 	def __repr__(self):
@@ -1237,9 +1246,11 @@ class declGen():
 		self.names=[]
 		if isinstance(syntree,equalOp):
 			self.names.append(context+[syntree.operand1])
+		elif isinstance(syntree,copyAssign):
+			self.names.append(context+[syntree.operand1])
 		elif isinstance(syntree,blockExpr) or isinstance(syntree,ast):
 			for i in syntree.tree:
-				if isinstance(i,equalOp):
+				if isinstance(i,equalOp) or isinstance(i,copyAssign):
 					self.names.append(context+[i.operand1])
 				elif isinstance(i,objStatement):
 					self.names.append(context+[i])
