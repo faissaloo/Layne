@@ -1150,6 +1150,16 @@ def parseLayer(tokens,noAssign=False):
 		if type(i) is tuple:
 			if i[0]=="id":
 				if i[1]=="if":
+					if tree.cursor+1>=len(tree):
+						print("\033[91mFatal error:\033[m If statement has no conditional on line "+str(tree[tree.cursor][3])+"\n"+
+							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
+							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						exit(255)
+					if tree.cursor+2>=len(tree):
+						print("\033[91mFatal error:\033[m If statement has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
+							(" "*(tree[tree.cursor+1].column))+"^",file=sys.stderr)
+						exit(255)
 					tree.tree.insert(tree.cursor,ifStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
@@ -1175,6 +1185,16 @@ def parseLayer(tokens,noAssign=False):
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 				elif i[1]=="while":
+					if tree.cursor+1>=len(tree):
+						print("\033[91mFatal error:\033[m While loop has no conditional on line "+str(tree[tree.cursor][3])+"\n"+
+							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
+							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						exit(255)
+					if tree.cursor+2>=len(tree):
+						print("\033[91mFatal error:\033[m While loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
+							(" "*(tree[tree.cursor+1].column))+"^",file=sys.stderr)
+						exit(255)
 					tree.tree.insert(tree.cursor,whileStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
