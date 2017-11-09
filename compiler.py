@@ -21,6 +21,14 @@ import os
 
 txt=open("example.l").read()
 
+class token():
+	def __init__(self,cat,tok,line,col):
+		self.cat=cat
+		self.tok=tok
+		self.line=line
+		self.col=col
+	def __repr__(self):
+		return self.cat+":"+self.tok
 #oquote = open quote
 #odquote = open double quote
 #str = a string
@@ -54,7 +62,7 @@ def tokenise():
 	colNum=0
 	def appendToken():
 		if curType!="whitespace":
-			tokens.append((curType,curToken,colNum,lineNum))
+			tokens.append(token(curType,curToken,colNum,lineNum))
 	for i in txt:
 		if i=="\n":
 			lineNum+=1
@@ -352,6 +360,7 @@ class addOp(dyadicOp):
 		return "("+self.operand1.__repr__()+" + "+self.operand2.__repr__()+")"
 	def C(self):
 		return 'call_method('+self.operand1.C()+',"add",1,(struct dyn_obj*[]){'+self.operand2.C()+'})'
+
 class minusOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" - "+self.operand2.__repr__()+")"
@@ -398,7 +407,6 @@ class copyOp(unaryOp):
 		return "@ "+self.operand.__repr__()
 	def C(self):
 		return 'copy_obj('+self.operand.C()+',NULL)'
-		#return 'call_method_noargs('+self.operand.C()+',"copy")'
 
 class unaryAssignment(unaryOp):
 	pass
@@ -447,7 +455,6 @@ class copyAssign(assignment):
 			return 'bind_member('+self.operand1.operand1.C()+',"'+self.operand1.operand2.C()+'",copy_obj('+self.operand2.C()+',NULL))'
 		else:
 			return self.operand1.C()+' = copy_obj('+self.operand2.C()+",NULL);"
-		#return self.operand1.C()+" = copy_obj("+self.operand2.C()+",NULL)"
 
 class addAssign(assignment):
 	def __repr__(self):
@@ -675,6 +682,7 @@ class funcCall():
 			return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",'+str(len(args))+',(struct dyn_obj*[]){'+(','.join(args))+'})'
 		else:
 			return "call_function("+self.name.C()+','+str(len(args)+1)+',(struct dyn_obj*[]){create_none(),'+(','.join(args))+'})'
+
 class statement():
 	pass
 
@@ -862,62 +870,62 @@ class ast():
 		self.tree.pop(self.cursor+1)
 
 	def consumeItem(self,obj,callFirst=None):
-		newObj=obj(self[self.cursor][1])
-		newObj.line=self[self.cursor][3]
-		newObj.column=self[self.cursor][2]
+		newObj=obj(self[self.cursor].tok)
+		newObj.line=self[self.cursor].line
+		newObj.col=self[self.cursor].col
 		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor+1)
 
 	def isUnary(self):
-		return self.cursor-1<0 or type(self[self.cursor-1]) is tuple
+		return self.cursor-1<0 or isinstance(self[self.cursor-1],token)
 
 	def consumeUnary(self,obj):
 		if self.cursor+1>=len(self):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor][3])+"\n"+
-				self.sourcecode[self[self.cursor][3]]+"\n"+
-				(" "*(self[self.cursor][2]-1))+"^",file=sys.stderr)
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor].line)+"\n"+
+				self.sourcecode[self[self.cursor].line]+"\n"+
+				(" "*(self[self.cursor].col-1))+"^",file=sys.stderr)
 			exit(255)
 
-		if type(self[self.cursor+1]) is tuple:
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1][3])+"\n"+
-				self.sourcecode[self[self.cursor+1][3]]+"\n"+
-				(" "*(self[self.cursor+1][2]-1))+"^",file=sys.stderr)
+		if isinstance(self[self.cursor-1],token):
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1].line)+"\n"+
+				self.sourcecode[self[self.cursor+1].line]+"\n"+
+				(" "*(self[self.cursor+1].col-1))+"^",file=sys.stderr)
 			exit(255)
 
 		newObj=obj(self[self.cursor+1])
-		newObj.line=self[self.cursor][3]
-		newObj.column=self[self.cursor][2]
+		newObj.line=self[self.cursor].line
+		newObj.col=self[self.cursor].col
 		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor+1)
 		self.tree.pop(self.cursor+1)
 
 	def consumeDyadic(self,obj):
 		if self.cursor+1>=len(self):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor][3])+"\n"+
-				self.sourcecode[self[self.cursor][3]]+"\n"+
-				(" "*(self[self.cursor][2]-1))+"^",file=sys.stderr)
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor].line)+"\n"+
+				self.sourcecode[self[self.cursor].line]+"\n"+
+				(" "*(self[self.cursor].col-1))+"^",file=sys.stderr)
 			exit(255)
 
 		if self.cursor<=0:
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor][3])+"\n"+
-				self.sourcecode[self[self.cursor][3]]+"\n"+
-				(" "*(self[self.cursor][2]-2))+"^",file=sys.stderr)
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor].line)+"\n"+
+				self.sourcecode[self[self.cursor].line]+"\n"+
+				(" "*(self[self.cursor].col-2))+"^",file=sys.stderr)
 			exit(255)
 
-		if type(self[self.cursor+1]) is tuple:
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1][3])+"\n"+
-				self.sourcecode[self[self.cursor+1][3]]+"\n"+
-				(" "*(self[self.cursor+1][2]-1))+"^",file=sys.stderr)
+		if isinstance(self[self.cursor+1],token):
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1].line)+"\n"+
+				self.sourcecode[self[self.cursor+1].line]+"\n"+
+				(" "*(self[self.cursor+1].col-1))+"^",file=sys.stderr)
 			exit(255)
-		elif type(self[self.cursor-1]) is tuple:
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor-1][3])+"\n"+
-				txt.split("\n")[self[self.cursor-1][3]]+"\n"+
-				(" "*(self[self.cursor-1][2]-1))+"^",file=sys.stderr)
+		elif isinstance(self[self.cursor-1],token):
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor-1].line)+"\n"+
+				txt.split("\n")[self[self.cursor-1].line]+"\n"+
+				(" "*(self[self.cursor-1].col-1))+"^",file=sys.stderr)
 			exit(255)
 
 		newObj=obj(self[self.cursor-1],self[self.cursor+1])
-		newObj.line=self[self.cursor][3]
-		newObj.column=self[self.cursor][2]
+		newObj.line=self[self.cursor].line
+		newObj.col=self[self.cursor].col
 		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor-1)
 		self.tree.pop(self.cursor)
@@ -942,29 +950,30 @@ def parseLayer(tokens,noAssign=False):
 			tree.consumeSubExpr(blockExpr)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="id":
-				if i[1] in ["global","true","false"]:
+		if isinstance(i,token):
+			if i.cat=="id":
+				if i.tok in ["global","true","false"]:
 					tree.consumeItem(keyword)
-				elif i[1] not in ["from","and","or","not","if","obj","fn","ret","for","while","import","else"]:
+				elif i.tok not in ["from","and","or","not","if","obj","fn","ret","for","while","import","else"]:
 					tree.consumeItem(variable)
+
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="str":
+		if isinstance(i,token):
+			if i.cat=="str":
 				tree.consumeItem(strLiteral)
-			elif i[0]=="int":
+			elif i.cat=="int":
 				tree.consumeItem(intLiteral)
-			elif i[0]=="flt":
+			elif i.cat=="flt":
 				tree.consumeItem(fltLiteral)
-			elif i[0]=="bin":
+			elif i.cat=="bin":
 				tree.consumeItem(binLiteral)
-			elif i[0]=="hex":
+			elif i.cat=="hex":
 				tree.consumeItem(hexLiteral)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="mdop":
-				if i[1]==".":
+		if isinstance(i,token):
+			if i.cat=="mdop":
+				if i.tok==".":
 					tree.consumeDyadic(dotOp)
 		#Array indexing
 		elif (not tree.isUnary()) and isinstance(tree[tree.cursor],brackExpr):
@@ -980,110 +989,109 @@ def parseLayer(tokens,noAssign=False):
 			tree.cursor-=1
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]=="*":
+		if isinstance(i,token):
+			if i.cat=="dop":
+				if i.tok=="*":
 					tree.consumeDyadic(mulOp)
-				elif i[1]=="/":
+				elif i.tok=="/":
 					tree.consumeDyadic(divOp)
-				elif i[1]=="%":
+				elif i.tok=="%":
 					tree.consumeDyadic(modOp)
 
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]==">>":
+		if isinstance(i,token):
+			if i.cat=="dop":
+				if i.tok==">>":
 					tree.consumeDyadic(bitRshOp)
-				elif i[1]=="<<":
+				elif i.tok=="<<":
 					tree.consumeDyadic(bitLshOp)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]=="&":
+		if isinstance(i,token):
+			if i.cat=="dop":
+				if i.tok=="&":
 					tree.consumeDyadic(bitAndOp)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]=="^":
+		if isinstance(i,token):
+			if i.cat=="dop":
+				if i.tok=="^":
 					tree.consumeDyadic(bitXorOp)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]=="|":
+		if isinstance(i,token):
+			if i.cat=="dop":
+				if i.tok=="|":
 					tree.consumeDyadic(bitOrOp)
 
 	tree.ltr=False
 	for i in tree:
-		#print(i)
-		if type(i) is tuple:
-			if i[0]=="uaiop":
-				if i[1]=="$+": #Should I just remove this one? It doesn't do anything
+		if isinstance(i,token):
+			if i.cat=="uaiop":
+				if i.tok=="$+": #Should I just remove this one? It doesn't do anything
 					tree.consumeUnary(iPosAssign)
 
-				elif i[1]=="$-":
+				elif i.tok=="$-":
 					tree.consumeUnary(iNegAssign)
 
-				elif i[1]=="$~":
+				elif i.tok=="$~":
 					tree.consumeUnary(iBitNotAssign)
-				elif i[1]=="$!":
+				elif i.tok=="$!":
 					tree.consumeUnary(iNotAssign)
 
 
-			elif i[0]=="udop":
-				if i[1]=="+":
+			elif i.cat=="udop":
+				if i.tok=="+":
 					if tree.isUnary():
 						tree.consumeUnary(uAddOp)
 					else:
 						tree.consumeDyadic(addOp)
-				elif i[1]=="-":
+				elif i.tok=="-":
 					if tree.isUnary():
 						tree.consumeUnary(negOp)
 					else:
 						tree.consumeDyadic(minusOp)
-			elif i[0]=="uop":
-				if i[1]=="~":
+			elif i.cat=="uop":
+				if i.tok=="~":
 					if tree.isUnary():
 						tree.consumeUnary(bitNotOp)
-			elif i[0]=="uadop":
-				if i[1]=="!":
+			elif i.cat=="uadop":
+				if i.tok=="!":
 					if tree.isUnary():
 						tree.consumeUnary(notOp)
-				elif i[1]=="@":
+				elif i.tok=="@":
 					if tree.isUnary():
 						tree.consumeUnary(copyOp)
 	tree.ltr=True
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="id":
-				if i[1]=="and":
+		if isinstance(i,token):
+			if i.cat=="id":
+				if i.tok=="and":
 						tree.consumeDyadic(andOp)
-				elif i[1]=="or":
+				elif i.tok=="or":
 						tree.consumeDyadic(orOp)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]=="?=":
+		if isinstance(i,token):
+			if i.cat=="dop":
+				if i.tok=="?=":
 					tree.consumeDyadic(isOp)
-				elif i[1]=="!=":
+				elif i.tok=="!=":
 					tree.consumeDyadic(notEqualTo)
-				elif i[1]=="<=":
+				elif i.tok=="<=":
 					tree.consumeDyadic(lessThanEqualTo)
-				elif i[1]==">=":
+				elif i.tok==">=":
 					tree.consumeDyadic(greaterThanEqualTo)
-				elif i[1]=="<":
+				elif i.tok=="<":
 					tree.consumeDyadic(lessThan)
-				elif i[1]==">":
+				elif i.tok==">":
 					tree.consumeDyadic(greaterThan)
 	tree.ltr=False
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="mdop":
-				if i[1]=="=":
+		if isinstance(i,token):
+			if i.cat=="mdop":
+				if i.tok=="=":
 					tree.consumeDyadic(equalOp)
 	tree.ltr=True
 	def assignError(tree,noAssign):
@@ -1095,105 +1103,105 @@ def parseLayer(tokens,noAssign=False):
 
 	for i in tree:
 		if type(i) is tuple:
-			if i[0]=="dop":
-				if i[1]=="@=":
+			if i.cat=="dop":
+				if i.tok=="@=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(copyAssign)
-				elif i[1]=="+=":
+				elif i.tok=="+=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(addAssign)
-				elif i[1]=="-=":
+				elif i.tok=="-=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(minusAssign)
-				elif i[1]=="*=":
+				elif i.tok=="*=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(mulAssign)
-				elif i[1]=="/=":
+				elif i.tok=="/=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(divAssign)
-				elif i[1]=="&=":
+				elif i.tok=="&=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(bitAndAssign)
-				elif i[1]=="^=":
+				elif i.tok=="^=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(bitXorAssign)
-				elif i[1]=="|=":
+				elif i.tok=="|=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(bitOrAssign)
-				elif i[1]==">>=":
+				elif i.tok==">>=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(bitRshAssign)
-				elif i[1]=="<<=":
+				elif i.tok=="<<=":
 					assignError(tree,noAssign)
 					tree.consumeDyadic(bitLshAssign)
 	tree.ltr=True
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="mdop":
-				if i[1]==":":
+		if isinstance(i,token):
+			if i.cat=="mdop":
+				if i.tok==":":
 					tree.consumeDyadic(dictItemOp)
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="mdop":
-				if i[1]==",":
+		if isinstance(i,token):
+			if i.cat=="mdop":
+				if i.tok==",":
 					tree.consumeDyadic(commaOp)
 
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="id":
-				if i[1]=="ret":
+		if isinstance(i,token):
+			if i.cat=="id":
+				if i.tok=="ret":
 					tree.consumeUnary(retStatement)
 
 	tree.ltr=False
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="id":
-				if i[1]=="if":
+		if isinstance(i,token):
+			if i.cat=="id":
+				if i.tok=="if":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m If statement has no conditional on line "+str(tree[tree.cursor][3])+"\n"+
-							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
-							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m If statement has no conditional on line "+str(tree[tree.cursor].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor].line]+"\n"+
+							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
 						exit(255)
 					if tree.cursor+2>=len(tree):
 						print("\033[91mFatal error:\033[m If statement has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
 							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
-							(" "*(tree[tree.cursor+1].column))+"^",file=sys.stderr)
+							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
 						exit(255)
 					tree.tree.insert(tree.cursor,ifStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
-				elif i[1]=="for":
+				elif i.tok=="for":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m For loop has no iterable, iterator or action on line "+str(tree[tree.cursor][3])+"\n"+
-							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
-							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m For loop has no iterable, iterator or action on line "+str(tree[tree.cursor].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor].line]+"\n"+
+							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
 						exit(255)
 					if not isinstance(tree[tree.cursor+1],dictItemOp):
-						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(tree[tree.cursor][3])+"\n"+
-							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
-							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(tree[tree.cursor].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor].line]+"\n"+
+							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
 						exit(255)
 					if tree.cursor+2>=len(tree):
 						print("\033[91mFatal error:\033[m For loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
 							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
-							(" "*(tree[tree.cursor+1].column))+"^",file=sys.stderr)
+							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
 						exit(255)
 					tree.tree.insert(tree.cursor,forStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
-				elif i[1]=="while":
+				elif i.tok=="while":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m While loop has no conditional on line "+str(tree[tree.cursor][3])+"\n"+
-							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
-							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m While loop has no conditional on line "+str(tree[tree.cursor].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor].line]+"\n"+
+							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
 						exit(255)
 					if tree.cursor+2>=len(tree):
 						print("\033[91mFatal error:\033[m While loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
 							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
-							(" "*(tree[tree.cursor+1].column))+"^",file=sys.stderr)
+							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
 						exit(255)
 					tree.tree.insert(tree.cursor,whileStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
@@ -1206,8 +1214,8 @@ def parseLayer(tokens,noAssign=False):
 				#or by checking directly if those are functions or objects (because these are the only things)
 				#that create new namespaces
 				#Maybe make a method for checking if things create new namespaces
-				elif i[1]=="obj":
-					if (type(tree[tree.cursor+2]) is tuple) and tree[tree.cursor+2][0]=="id" and tree[tree.cursor+2][1]=="from":
+				elif i.tok=="obj":
+					if (isinstance(tree[tree.cursor+2],token)) and tree[tree.cursor+2].cat=="id" and tree[tree.cursor+2].tok=="from":
 						tree.tree.insert(tree.cursor,objStatement(tree[tree.cursor+1],tree[tree.cursor+4],tree[tree.cursor+3]))
 						tree.definedObjects.append(tree[tree.cursor])
 						tree.tree.pop(tree.cursor+1)
@@ -1221,7 +1229,7 @@ def parseLayer(tokens,noAssign=False):
 						tree.tree.pop(tree.cursor+1)
 						tree.tree.pop(tree.cursor+1)
 						tree.tree.pop(tree.cursor+1)
-				elif i[1]=="fn":
+				elif i.tok=="fn":
 					tree.tree.insert(tree.cursor,funcStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.definedFunctions.append(tree[tree.cursor])
 					tree.tree.pop(tree.cursor+1)
@@ -1230,9 +1238,9 @@ def parseLayer(tokens,noAssign=False):
 
 	tree.ltr=True
 	for i in tree:
-		if type(i) is tuple:
-			if i[0]=="id":
-				if i[1]=="else":
+		if isinstance(i,token):
+			if i.cat=="id":
+				if i.tok=="else":
 					tree.consumeDyadic(elseStatement)
 
 	#Take note of assignments
@@ -1248,19 +1256,19 @@ def handleBrack(lst):
 	toRet=[]
 	i=0
 	while i < len(lst):
-		if lst[i][0]=="oparen":
+		if lst[i].cat=="oparen":
 			returned=handleParen(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="obrace":
+		elif lst[i].cat=="obrace":
 			returned=handleBlocks(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="obrack":
+		elif lst[i].cat=="obrack":
 			returned=handleBrack(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="cbrack":
+		elif lst[i].cat=="cbrack":
 			return brackTok(toRet),i
 		else:
 			toRet.append(lst[i])
@@ -1272,19 +1280,19 @@ def handleParen(lst):
 	toRet=[]
 	i=0
 	while i < len(lst):
-		if lst[i][0]=="obrace":
+		if lst[i].cat=="obrace":
 			returned=handleBlocks(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="obrack":
+		elif lst[i].cat=="obrack":
 			returned=handleBrack(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="oparen":
+		elif lst[i].cat=="oparen":
 			returned=handleParen(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="cparen":
+		elif lst[i].cat=="cparen":
 			return parenthTok(toRet),i
 		else:
 			toRet.append(lst[i])
@@ -1296,19 +1304,19 @@ def handleBlocks(lst):
 	toRet=[]
 	i=0
 	while i < len(lst):
-		if lst[i][0]=="oparen":
+		if lst[i].cat=="oparen":
 			returned=handleParen(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="obrack":
+		elif lst[i].cat=="obrack":
 			returned=handleBrack(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="obrace":
+		elif lst[i].cat=="obrace":
 			returned=handleBlocks(lst[i+1:])
 			toRet.append(returned[0])
 			i+=returned[1]+1
-		elif lst[i][0]=="cbrace":
+		elif lst[i].cat=="cbrace":
 			return blockTok(toRet),i
 		else:
 			toRet.append(lst[i])
