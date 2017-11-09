@@ -858,10 +858,7 @@ class ast():
 
 
 	def consumeSubExpr(self,obj,noAssign=False):
-		newObj=obj(parseLayer(self[self.cursor],noAssign))
-		newObj.line=self[self.cursor][3]
-		newObj.column=self[self.cursor][2]
-		self.tree.insert(self.cursor,newObj)
+		self.tree.insert(self.cursor,obj(parseLayer(self[self.cursor],noAssign)))
 		self.tree.pop(self.cursor+1)
 
 	def consumeItem(self,obj,callFirst=None):
@@ -1158,7 +1155,12 @@ def parseLayer(tokens,noAssign=False):
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 				elif i[1]=="for":
-					#This syntax makes 0 sense m800m88
+					if not isinstance(tree[tree.cursor+1],dictItemOp):
+						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(tree[tree.cursor][3])+"\n"+
+							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
+							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						exit(255)
+
 					tree.tree.insert(tree.cursor,forStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
