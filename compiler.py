@@ -1155,12 +1155,23 @@ def parseLayer(tokens,noAssign=False):
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 				elif i[1]=="for":
+
+
+					if tree.cursor+1>=len(tree):
+						print("\033[91mFatal error:\033[m For loop has no iterable, iterator or action on line"+str(tree[tree.cursor][3])+"\n"+
+							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
+							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
+						exit(255)
 					if not isinstance(tree[tree.cursor+1],dictItemOp):
 						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(tree[tree.cursor][3])+"\n"+
 							txt.split("\n")[tree[tree.cursor][3]]+"\n"+
 							(" "*(tree[tree.cursor][2]))+"^",file=sys.stderr)
 						exit(255)
-
+					if tree.cursor+2>=len(tree):
+						print("\033[91mFatal error:\033[m For loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
+							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
+							(" "*(tree[tree.cursor+1].column))+"^",file=sys.stderr)
+						exit(255)
 					tree.tree.insert(tree.cursor,forStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
