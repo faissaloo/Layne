@@ -359,10 +359,14 @@ class minusOp(dyadicOp):
 class bitNotOp(unaryOp):
 	def __repr__(self):
 		return "~ "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"not")'
 
 class uAddOp(unaryOp):
 	def __repr__(self):
 		return "+ "+self.operand.__repr__()
+	def C(self):
+		return 'call_method_noargs('+self.operand.C()+',"pos")'
 
 class negOp(unaryOp):
 	def __repr__(self):
@@ -386,7 +390,7 @@ class notOp(unaryOp):
 	def __repr__(self):
 		return "NOT "+self.operand.__repr__()
 	def C(self):
-		return 'call_method_noargs('+self.operand.C()+',"not")'
+		return 'call_method_noargs('+self.operand.C()+',"bnot")'
 
 #For when you want to pass by copy and not by reference
 class copyOp(unaryOp):
@@ -854,27 +858,55 @@ class ast():
 
 
 	def consumeSubExpr(self,obj,noAssign=False):
-		self.tree.insert(self.cursor,obj(parseLayer(self[self.cursor],noAssign)))
+		newObj=obj(parseLayer(self[self.cursor],noAssign))
+		newObj.line=self[self.cursor][3]
+		newObj.column=self[self.cursor][2]
+		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor+1)
 
 	def consumeItem(self,obj,callFirst=None):
-		self.tree.insert(self.cursor,obj(self[self.cursor][1]))
+		newObj=obj(self[self.cursor][1])
+		newObj.line=self[self.cursor][3]
+		newObj.column=self[self.cursor][2]
+		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor+1)
 
 	def isUnary(self):
 		return self.cursor-1<0 or type(self[self.cursor-1]) is tuple
 
 	def consumeUnary(self,obj):
+		if self.cursor+1>=len(self):
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor][3])+"\n"+
+				self.sourcecode[self[self.cursor][3]]+"\n"+
+				(" "*(self[self.cursor][2]-1))+"^",file=sys.stderr)
+			exit(255)
+
 		if type(self[self.cursor+1]) is tuple:
 			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1][3])+"\n"+
 				self.sourcecode[self[self.cursor+1][3]]+"\n"+
 				(" "*(self[self.cursor+1][2]-1))+"^",file=sys.stderr)
 			exit(255)
-		self.tree.insert(self.cursor,obj(self[self.cursor+1]))
+
+		newObj=obj(self[self.cursor+1])
+		newObj.line=self[self.cursor][3]
+		newObj.column=self[self.cursor][2]
+		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor+1)
 		self.tree.pop(self.cursor+1)
 
 	def consumeDyadic(self,obj):
+		if self.cursor+1>=len(self):
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor][3])+"\n"+
+				self.sourcecode[self[self.cursor][3]]+"\n"+
+				(" "*(self[self.cursor][2]-1))+"^",file=sys.stderr)
+			exit(255)
+
+		if self.cursor<=0:
+			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor][3])+"\n"+
+				self.sourcecode[self[self.cursor][3]]+"\n"+
+				(" "*(self[self.cursor][2]-2))+"^",file=sys.stderr)
+			exit(255)
+
 		if type(self[self.cursor+1]) is tuple:
 			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1][3])+"\n"+
 				self.sourcecode[self[self.cursor+1][3]]+"\n"+
