@@ -886,7 +886,10 @@ class ast():
 				(" "*(self[self.cursor-1][2]-1))+"^",file=sys.stderr)
 			exit(255)
 
-		self.tree.insert(self.cursor,obj(self[self.cursor-1],self[self.cursor+1]))
+		newObj=obj(self[self.cursor-1],self[self.cursor+1])
+		newObj.line=self[self.cursor][3]
+		newObj.column=self[self.cursor][2]
+		self.tree.insert(self.cursor,newObj)
 		self.tree.pop(self.cursor-1)
 		self.tree.pop(self.cursor)
 		self.tree.pop(self.cursor)
@@ -1054,30 +1057,48 @@ def parseLayer(tokens,noAssign=False):
 				if i[1]=="=":
 					tree.consumeDyadic(equalOp)
 	tree.ltr=True
-	if not noAssign:
-		for i in tree:
-			if type(i) is tuple:
-				if i[0]=="dop":
-					if i[1]=="@=":
-						tree.consumeDyadic(copyAssign)
-					elif i[1]=="+=":
-						tree.consumeDyadic(addAssign)
-					elif i[1]=="-=":
-						tree.consumeDyadic(minusAssign)
-					elif i[1]=="*=":
-						tree.consumeDyadic(mulAssign)
-					elif i[1]=="/=":
-						tree.consumeDyadic(divAssign)
-					elif i[1]=="&=":
-						tree.consumeDyadic(bitAndAssign)
-					elif i[1]=="^=":
-						tree.consumeDyadic(bitXorAssign)
-					elif i[1]=="|=":
-						tree.consumeDyadic(bitOrAssign)
-					elif i[1]==">>=":
-						tree.consumeDyadic(bitRshAssign)
-					elif i[1]=="<<=":
-						tree.consumeDyadic(bitLshAssign)
+	def assignError(tree,noAssign):
+		if noAssign or isinstance(tree[tree.cursor-1],assignment) or isinstance(tree[tree.cursor+1],assignment) or (isinstance(tree[tree.cursor-1],equalOp)):
+			print("\033[91mFatal error:\033[m Cannot assign in expression on line "+str(tree[tree.cursor-1].line)+"\n"+
+				txt.split("\n")[tree[tree.cursor-1].line]+"\n"+
+				(" "*(tree[tree.cursor-1].column-1))+"^",file=sys.stderr)
+
+
+	for i in tree:
+		if type(i) is tuple:
+			if i[0]=="dop":
+				if i[1]=="@=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(copyAssign)
+				elif i[1]=="+=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(addAssign)
+				elif i[1]=="-=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(minusAssign)
+				elif i[1]=="*=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(mulAssign)
+				elif i[1]=="/=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(divAssign)
+				elif i[1]=="&=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(bitAndAssign)
+				elif i[1]=="^=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(bitXorAssign)
+				elif i[1]=="|=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(bitOrAssign)
+				elif i[1]==">>=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(bitRshAssign)
+				elif i[1]=="<<=":
+					assignError(tree,noAssign)
+					tree.consumeDyadic(bitLshAssign)
+	tree.ltr=True
+
 	for i in tree:
 		if type(i) is tuple:
 			if i[0]=="mdop":
