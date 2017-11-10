@@ -62,7 +62,7 @@ def tokenise():
 	colNum=0
 	def appendToken():
 		if curType!="whitespace":
-			tokens.append(token(curType,curToken,colNum,lineNum))
+			tokens.append(token(curType,curToken,lineNum,colNum))
 	for i in txt:
 		if i=="\n":
 			lineNum+=1
@@ -1159,51 +1159,60 @@ def parseLayer(tokens,noAssign=False):
 			if i.cat=="id":
 				if i.tok=="if":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m If statement has no conditional on line "+str(tree[tree.cursor].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor].line]+"\n"+
-							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m If statement has no conditional on line "+str(i.line)+"\n"+
+							txt.split("\n")[i.line]+"\n"+
+							(" "*(i.col))+"^",file=sys.stderr)
 						exit(255)
 					if tree.cursor+2>=len(tree):
 						print("\033[91mFatal error:\033[m If statement has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
 							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
 							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
 						exit(255)
-					tree.tree.insert(tree.cursor,ifStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
+					newObj=ifStatement(tree[tree.cursor+1],tree[tree.cursor+2])
+					newObj.line=i.line
+					newObj.col=i.col
+					tree.tree.insert(tree.cursor,newObj)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 				elif i.tok=="for":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m For loop has no iterable, iterator or action on line "+str(tree[tree.cursor].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor].line]+"\n"+
-							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m For loop has no iterable, iterator or action on line "+str(i.line)+"\n"+
+							txt.split("\n")[i.line]+"\n"+
+							(" "*(i].col))+"^",file=sys.stderr)
 						exit(255)
 					if not isinstance(tree[tree.cursor+1],dictItemOp):
-						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(tree[tree.cursor].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor].line]+"\n"+
-							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(i.line)+"\n"+
+							txt.split("\n")[i.line]+"\n"+
+							(" "*(i.col))+"^",file=sys.stderr)
 						exit(255)
 					if tree.cursor+2>=len(tree):
 						print("\033[91mFatal error:\033[m For loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
 							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
 							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
 						exit(255)
-					tree.tree.insert(tree.cursor,forStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
+					newObj=forStatement(tree[tree.cursor+1],tree[tree.cursor+2])
+					newObj.line=i.line
+					newObj.col=i.col
+					tree.tree.insert(tree.cursor,newObj)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 				elif i.tok=="while":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m While loop has no conditional on line "+str(tree[tree.cursor].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor].line]+"\n"+
-							(" "*(tree[tree.cursor].col))+"^",file=sys.stderr)
+						print("\033[91mFatal error:\033[m While loop has no conditional on line "+str(i.line)+"\n"+
+							txt.split("\n")[i.line]+"\n"+
+							(" "*(i.col))+"^",file=sys.stderr)
 						exit(255)
 					if tree.cursor+2>=len(tree):
 						print("\033[91mFatal error:\033[m While loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
 							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
 							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
 						exit(255)
-					tree.tree.insert(tree.cursor,whileStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
+					newObj=whileStatement(tree[tree.cursor+1],tree[tree.cursor+2])
+					newObj.line=i.line
+					newObj.col=i.col
+					tree.tree.insert(tree.cursor,newObj)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
@@ -1216,7 +1225,10 @@ def parseLayer(tokens,noAssign=False):
 				#Maybe make a method for checking if things create new namespaces
 				elif i.tok=="obj":
 					if (isinstance(tree[tree.cursor+2],token)) and tree[tree.cursor+2].cat=="id" and tree[tree.cursor+2].tok=="from":
-						tree.tree.insert(tree.cursor,objStatement(tree[tree.cursor+1],tree[tree.cursor+4],tree[tree.cursor+3]))
+						newObj=objStatement(tree[tree.cursor+1],tree[tree.cursor+4],tree[tree.cursor+3])
+						newObj.line=i.line
+						newObj.col=i.col
+						tree.tree.insert(tree.cursor,newObj)
 						tree.definedObjects.append(tree[tree.cursor])
 						tree.tree.pop(tree.cursor+1)
 						tree.tree.pop(tree.cursor+1)
@@ -1224,13 +1236,19 @@ def parseLayer(tokens,noAssign=False):
 						tree.tree.pop(tree.cursor+1)
 						tree.tree.pop(tree.cursor+1)
 					else:
-						tree.tree.insert(tree.cursor,objStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
+						newObj=objStatement(tree[tree.cursor+1],tree[tree.cursor+2])
+						newObj.line=i.line
+						newObj.col=i.col
+						tree.tree.insert(tree.cursor,newObj)
 						tree.definedObjects.append(tree[tree.cursor])
 						tree.tree.pop(tree.cursor+1)
 						tree.tree.pop(tree.cursor+1)
 						tree.tree.pop(tree.cursor+1)
 				elif i.tok=="fn":
-					tree.tree.insert(tree.cursor,funcStatement(tree[tree.cursor+1],tree[tree.cursor+2]))
+					newObj=funcStatement(tree[tree.cursor+1],tree[tree.cursor+2])
+					newObj.line=i.line
+					newObj.col=i.col
+					tree.tree.insert(tree.cursor,newObj)
 					tree.definedFunctions.append(tree[tree.cursor])
 					tree.tree.pop(tree.cursor+1)
 					tree.tree.pop(tree.cursor+1)
