@@ -21,6 +21,12 @@ import os
 
 txt=open("example.l").read()
 
+def compilerError(msg,line,col):
+	print("\033[91mFatal error:\033[m "+msg+" on line "+str(line)+"\n"+
+		txt.split("\n")[line]+"\n"+
+		(" "*(col))+"^",file=sys.stderr)
+	exit(255)
+
 class token():
 	def __init__(self,cat,tok,line,col):
 		self.cat=cat
@@ -215,13 +221,10 @@ def tokenise():
 			curType="mdop"
 			curToken=i
 		else:
-			print("\033[91mFatal error:\033[m Unexpected symbol at line "+str(lineNum)+"\n"+
-				txt.split("\n")[lineNum]+"\n"+
-				(" "*(colNum-1))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Unexpected symbol",lineNum,colNum)
 
 	appendToken()
-	return tokens#[1:]
+	return tokens
 
 class literal():
 	def __init__(self,contents):
@@ -881,16 +884,10 @@ class ast():
 
 	def consumeUnary(self,obj):
 		if self.cursor+1>=len(self):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor].line)+"\n"+
-				self.sourcecode[self[self.cursor].line]+"\n"+
-				(" "*(self[self.cursor].col-1))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
 
 		if isinstance(self[self.cursor-1],token):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1].line)+"\n"+
-				self.sourcecode[self[self.cursor+1].line]+"\n"+
-				(" "*(self[self.cursor+1].col-1))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
 
 		newObj=obj(self[self.cursor+1])
 		newObj.line=self[self.cursor].line
@@ -901,27 +898,15 @@ class ast():
 
 	def consumeDyadic(self,obj):
 		if self.cursor+1>=len(self):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor].line)+"\n"+
-				self.sourcecode[self[self.cursor].line]+"\n"+
-				(" "*(self[self.cursor].col-1))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
 
 		if self.cursor<=0:
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor].line)+"\n"+
-				self.sourcecode[self[self.cursor].line]+"\n"+
-				(" "*(self[self.cursor].col-2))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
 
 		if isinstance(self[self.cursor+1],token):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor+1].line)+"\n"+
-				self.sourcecode[self[self.cursor+1].line]+"\n"+
-				(" "*(self[self.cursor+1].col-1))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Invalid syntax",self[self.cursor+1].line,self[self.cursor+1].col)
 		elif isinstance(self[self.cursor-1],token):
-			print("\033[91mFatal error:\033[m Invalid syntax at line "+str(self[self.cursor-1].line)+"\n"+
-				txt.split("\n")[self[self.cursor-1].line]+"\n"+
-				(" "*(self[self.cursor-1].col-1))+"^",file=sys.stderr)
-			exit(255)
+			compilerError("Invalid syntax",self[self.cursor-1].line,self[self.cursor-1].col)
 
 		newObj=obj(self[self.cursor-1],self[self.cursor+1])
 		newObj.line=self[self.cursor].line
@@ -1096,10 +1081,7 @@ def parseLayer(tokens,noAssign=False):
 	tree.ltr=True
 	def assignError(tree,noAssign):
 		if noAssign or isinstance(tree[tree.cursor-1],assignment) or isinstance(tree[tree.cursor+1],assignment) or (isinstance(tree[tree.cursor-1],equalOp)):
-			print("\033[91mFatal error:\033[m Cannot assign in expression on line "+str(tree[tree.cursor-1].line)+"\n"+
-				txt.split("\n")[tree[tree.cursor-1].line]+"\n"+
-				(" "*(tree[tree.cursor-1].column-1))+"^",file=sys.stderr)
-
+			compilerError("Cannot assign in expression",tree[tree.cursor].line,tree[tree.cursor].col)
 
 	for i in tree:
 		if type(i) is tuple:
@@ -1159,15 +1141,9 @@ def parseLayer(tokens,noAssign=False):
 			if i.cat=="id":
 				if i.tok=="if":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m If statement has no conditional on line "+str(i.line)+"\n"+
-							txt.split("\n")[i.line]+"\n"+
-							(" "*(i.col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("If statement has no conditional",i.line,i.col)
 					if tree.cursor+2>=len(tree):
-						print("\033[91mFatal error:\033[m If statement has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
-							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("If statement has no action",i.line,i.col)
 					newObj=ifStatement(tree[tree.cursor+1],tree[tree.cursor+2])
 					newObj.line=i.line
 					newObj.col=i.col
@@ -1177,20 +1153,11 @@ def parseLayer(tokens,noAssign=False):
 					tree.tree.pop(tree.cursor+1)
 				elif i.tok=="for":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m For loop has no iterable, iterator or action on line "+str(i.line)+"\n"+
-							txt.split("\n")[i.line]+"\n"+
-							(" "*(i].col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("For loop has no iterable, iterator or action",i.line,i.col)
 					if not isinstance(tree[tree.cursor+1],dictItemOp):
-						print("\033[91mFatal error:\033[m No iterator variable or iterable specified (missing ':') on line "+str(i.line)+"\n"+
-							txt.split("\n")[i.line]+"\n"+
-							(" "*(i.col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("No iterator variable or iterable specified (missing ':')",i.line,i.col)
 					if tree.cursor+2>=len(tree):
-						print("\033[91mFatal error:\033[m For loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
-							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("For loop has no action",tree[tree.cursor+1].line,tree[tree.cursor+1].col)
 					newObj=forStatement(tree[tree.cursor+1],tree[tree.cursor+2])
 					newObj.line=i.line
 					newObj.col=i.col
@@ -1200,15 +1167,9 @@ def parseLayer(tokens,noAssign=False):
 					tree.tree.pop(tree.cursor+1)
 				elif i.tok=="while":
 					if tree.cursor+1>=len(tree):
-						print("\033[91mFatal error:\033[m While loop has no conditional on line "+str(i.line)+"\n"+
-							txt.split("\n")[i.line]+"\n"+
-							(" "*(i.col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("While loop has no conditional",i.line,i.col)
 					if tree.cursor+2>=len(tree):
-						print("\033[91mFatal error:\033[m While loop has no action on line "+str(tree[tree.cursor+1].line)+"\n"+
-							txt.split("\n")[tree[tree.cursor+1].line]+"\n"+
-							(" "*(tree[tree.cursor+1].col))+"^",file=sys.stderr)
-						exit(255)
+						compilerError("While loop has no action",tree[tree.cursor+1].line,tree[tree.cursor+1].col)
 					newObj=whileStatement(tree[tree.cursor+1],tree[tree.cursor+2])
 					newObj.line=i.line
 					newObj.col=i.col
