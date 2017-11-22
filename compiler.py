@@ -1237,14 +1237,20 @@ def handleBrack(lst):
 	while i < len(lst):
 		if lst[i].cat=="oparen":
 			returned=handleParen(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched parenthesis",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="obrace":
 			returned=handleBlocks(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched brace",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="obrack":
 			returned=handleBrack(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched bracket",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="cbrack":
@@ -1261,14 +1267,20 @@ def handleParen(lst):
 	while i < len(lst):
 		if lst[i].cat=="obrace":
 			returned=handleBlocks(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched brace",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="obrack":
 			returned=handleBrack(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched bracket",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="oparen":
 			returned=handleParen(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched parenthesis",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="cparen":
@@ -1281,25 +1293,38 @@ def handleParen(lst):
 #Creates a code block tree
 def handleBlocks(lst):
 	toRet=[]
+	#i is characters to skip
 	i=0
 	while i < len(lst):
 		if lst[i].cat=="oparen":
 			returned=handleParen(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched parenthesis",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="obrack":
 			returned=handleBrack(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched bracket",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="obrace":
 			returned=handleBlocks(lst[i+1:])
+			if not isinstance(returned,tuple):
+				compilerError("Mismatched brace",lst[i].line,lst[i].col)
 			toRet.append(returned[0])
 			i+=returned[1]+1
 		elif lst[i].cat=="cbrace":
-			return blockTok(toRet),i
+			#All other blocks return from here
+			newObj=blockTok(toRet)
+			newObj.line=lst[0].line
+			newObj.col=lst[0].col
+			return newObj,i
 		else:
 			toRet.append(lst[i])
 		i+=1
+
+	#Only happens for outermost block
 	return blockTok(toRet)
 
 #Grabs all the objects that a variable can be (in addition to builtins)
