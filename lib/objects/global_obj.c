@@ -74,7 +74,7 @@ def_dyn_fn(global_print)
 	#ifdef DEBUG
 		arg_guard(2,2,protect({"self","str"}),protect({GLOBAL,STR}));
 	#endif
-	printf("%s",*get_str_val(args[1])->raw);
+	dyn_str_print(get_str_val(args[1]));
 	return kw_none;
 }
 
@@ -83,7 +83,7 @@ def_dyn_fn(global_input)
 	#ifdef DEBUG
 		arg_guard(2,2,protect({"self","str"}),protect({GLOBAL,STR}));
 	#endif
-	printf("%s",*get_str_val(args[1])->raw);
+	dyn_str_print(get_str_val(args[1]));
 	char buff[1024];
 	struct dyn_str *new_str;
 	new_str=dyn_str_create();

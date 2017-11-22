@@ -171,6 +171,11 @@ double dyn_str_to_double(struct dyn_str *self)
 	return strtod(*self->raw,&end);
 }
 
+void dyn_str_print(struct dyn_str *self)
+{
+	fwrite(*self->raw,sizeof(char),self->filled,stdout);
+}
+
 hash_t dyn_str_hash(struct dyn_str *self)
 {
 	hash_t hash;

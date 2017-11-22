@@ -39,4 +39,5 @@ int dyn_str_to_int(struct dyn_str *self);
 double dyn_str_to_double(struct dyn_str *self);
 bool dyn_str_eq(struct dyn_str *a, struct dyn_str *b);
 struct dyn_str* dyn_str_copy(struct dyn_str *self);
+void dyn_str_print(struct dyn_str *self);
 #endif
