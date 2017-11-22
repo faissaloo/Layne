@@ -17,6 +17,8 @@
 
 #include <gc.h>
 #include <stdio.h>
+#include <errno.h>
+#include <string.h>
 
 #include "dyn_objs.h"
 #include "global_obj.h"
@@ -27,6 +29,7 @@
 #include "flt_obj.h"
 #include "bool_obj.h"
 #include "none_obj.h"
+#include "dyn_str.h"
 #include "debug.h"
 
 struct dyn_obj *kw_global;
@@ -39,8 +42,12 @@ struct dyn_obj *flt_factory;
 struct dyn_obj *bool_factory;
 struct dyn_obj *str_factory;
 
-struct method_list global_methods={1,{"print",global_print}};
-struct method_list factory_global_methods={1,{"print",factory_global_print}};
+struct method_list global_methods={2,
+	{
+		method_pair("print",global_print),
+		method_pair("input",global_input)
+	}
+};
 
 struct dyn_obj* create_global()
 {
@@ -68,4 +75,25 @@ def_dyn_fn(global_print)
 		arg_guard(2,2,protect({"self","str"}),protect({GLOBAL,STR}));
 	#endif
 	printf("%s",*get_str_val(args[1])->raw);
+	return kw_none;
+}
+
+def_dyn_fn(global_input)
+{
+	#ifdef DEBUG
+		arg_guard(2,2,protect({"self","str"}),protect({GLOBAL,STR}));
+	#endif
+	printf("%s",*get_str_val(args[1])->raw);
+	char buff[1024];
+	struct dyn_str *new_str;
+	new_str=dyn_str_create();
+	while (fgets(buff,sizeof(buff),stdin)!=NULL){
+		dyn_str_cat_cstr(new_str,buff);
+		if ((*new_str->raw)[new_str->filled-1]=='\n')
+		{
+			break;
+		}
+	}
+	new_str->filled--; //Cut out the newline
+	return create_str(new_str);
 }

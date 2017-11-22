@@ -70,11 +70,6 @@ def tokenise():
 		if curType!="whitespace":
 			tokens.append(token(curType,curToken,lineNum,colNum))
 	for i in txt:
-		if i=="\n":
-			lineNum+=1
-			colNum=0
-		else:
-			colNum+=1
 		#String quotes
 		if i=="'":
 			if curType!="oquote":
@@ -220,9 +215,13 @@ def tokenise():
 			appendToken()
 			curType="mdop"
 			curToken=i
+		elif i=="\n":
+			lineNum+=1
+			colNum=-1
 		else:
 			compilerError("Unexpected symbol",lineNum,colNum)
 
+		colNum+=1
 	appendToken()
 	return tokens
 

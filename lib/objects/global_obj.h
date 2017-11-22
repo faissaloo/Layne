@@ -30,4 +30,5 @@ extern struct method_list global_methods;
 extern struct method_list factory_global_methods;
 
 decl_dyn_fn(global_print);
+decl_dyn_fn(global_input);
 #endif
