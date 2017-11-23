@@ -53,7 +53,7 @@ struct dyn_obj* create_str_iter(struct dyn_str *to_iter)
 def_dyn_fn(str_iter_new)
 {
 	#ifdef DEBUG
-		arg_guard(1,1,protect({"str"}),protect({str_iter}));
+		arg_guard(1,1,protect({"str"}),protect({STR_ITER}));
 	#endif
 
 	//Value to create the int from
@@ -63,7 +63,7 @@ def_dyn_fn(str_iter_new)
 def_dyn_fn(str_iter_next)
 {
 	#ifdef DEBUG
-		arg_guard(1,1,protect({"self"}),protect({str_iter}));
+		arg_guard(1,1,protect({"self"}),protect({STR_ITER}));
 	#endif
 
 	if (((struct str_iter_obj*)SELF)->to_iter->filled>((struct str_iter_obj*)SELF)->index)
