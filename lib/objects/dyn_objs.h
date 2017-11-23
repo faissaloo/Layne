@@ -219,5 +219,4 @@ extern struct dyn_obj *int_factory;
 extern struct dyn_obj *flt_factory;
 extern struct dyn_obj *bool_factory;
 extern struct dyn_obj *str_factory;
-
 #endif

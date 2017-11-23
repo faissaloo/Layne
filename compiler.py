@@ -1402,13 +1402,19 @@ class declGen():
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
 				to_ret+='extern struct method_list OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_methods;\n'
-				to_ret+='extern struct method_list factory_OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_methods;\n'
+				to_ret+='extern struct dyn_obj *OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_factory;\n'
 		to_ret+="#endif\n"
 		return to_ret
 
 	def genObjMethodListRefs(self):
 		if self.objNames:
 			return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+		else:
+			return ""
+
+	def genFactoryListRefs(self):
+		if self.objNames:
+			return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_factory" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
 		else:
 			return ""
 
@@ -1443,8 +1449,8 @@ class declGen():
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
-				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tfactory_setup("+i[-1].enum+');\n}\n'
-
+				to_ret+='struct dyn_obj *'+i[-1].enum+'_factory;'
+				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tfactory_setup("+i[-1].enum+');\n\t'+i[-1].enum+"_factory"+'=self;\n}\n'
 		#Method implementations
 		#Search for things in our list that match [PATH TO THE OBJECT][A FUNCTION]
 		def funcGen(ii):
@@ -1518,7 +1524,10 @@ class declGen():
 			return "\n\t"+",\n\t".join(["&type_factory" for i in self.objNames])
 		else:
 			return ""
-#print(parsedSource)
+
+if not os.path.exists("lib/parserdata"):
+	os.mkdir("lib/parserdata")
+
 d=declGen(parsedSource)
 with open("lib/parserdata/obj_enums.txt","w") as f:
 	f.write(d.genObjEnums())
@@ -1530,6 +1539,8 @@ with open("lib/parserdata/obj_type_parent_refs.txt","w") as f:
 	f.write(d.genObjParentRefs())
 with open("lib/parserdata/obj_method_list_refs.txt","w") as f:
 	f.write(d.genObjMethodListRefs())
+with open("lib/parserdata/obj_type_factory_list_refs.txt","w") as f:
+	f.write(d.genFactoryListRefs())
 with open("lib/parserdata/main.h","w") as f:
 	f.write(d.genHeader())
 with open("lib/parserdata/main.c","w") as f:
