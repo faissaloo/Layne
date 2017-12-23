@@ -797,7 +797,7 @@ class funcStatement(newContextStatement):
 		self.prototype=prototype
 		self.name=self.prototype.name
 		self.code=code
-		self.parentContext=None
+		self.path=None
 		self.cfunc=None
 
 		self.param=funcParamList(self.prototype.parenthExpr.tree)
@@ -807,6 +807,25 @@ class funcStatement(newContextStatement):
 
 	def maxLen(self):
 		return self.param.maxLen()
+
+	def genDef(self):
+		to_ret=""
+		to_ret+=("def_dyn_fn(FN_"+
+			("_".join([str(iii.name) for iii in self.path]))+
+			')\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(self.minLen())+','+str(self.maxLen())+',protect({"self"'+
+			(''.join([',"'+str(iii.var)+'"' for iii in self.param]))+
+			'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(iii.type.C())+")->type_to_create") if iii.type else ",TYPE" for iii in self.param]))+
+			'}));\n\t#endif\n')
+		to_ret+='\tstruct dyn_obj* self=args[0];\n'
+
+		for iii,j in enumerate(self.param):
+			if j.default:
+				to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args->filled>='+str(iii+1)+'?args['+str(iii+1)+']:'+j.default.C()+';\n'
+			else:
+				to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args['+str(iii+1)+'];\n'
+		to_ret+="".join(["struct dyn_obj *"+iii.C()+";\n" for iii in self.localvars])
+		to_ret+=self.code.C()+"\n}\n\n"
+		return to_ret
 
 	#This just binds the real name of the C function to the object with bind_method
 	def C(self):
@@ -1451,36 +1470,18 @@ class declGen():
 			if isinstance(i[-1],objStatement):
 				to_ret+='struct dyn_obj *'+i[-1].enum+'_factory;'
 				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tfactory_setup("+i[-1].enum+');\n\t'+i[-1].enum+"_factory"+'=self;\n}\n'
-		#Method implementations
-		#Search for things in our list that match [PATH TO THE OBJECT][A FUNCTION]
-		def funcGen(ii):
-			to_ret=""
-			to_ret+=("def_dyn_fn(FN_"+
-				("_".join([str(iii.name) for iii in ii]))+
-				')\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(ii[-1].minLen())+','+str(ii[-1].maxLen())+',protect({"self"'+
-				(''.join([',"'+str(iii.var)+'"' for iii in ii[-1].param]))+
-				'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(iii.type.C())+")->type_to_create") if iii.type else ",TYPE" for iii in ii[-1].param]))+
-				'}));\n\t#endif\n')
-			to_ret+='\tstruct dyn_obj* self=args[0];\n'
-
-			for iii,j in enumerate(ii[-1].param):
-				if j.default:
-					to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args->filled>='+str(iii+1)+'?args['+str(iii+1)+']:'+j.default.C()+';\n'
-				else:
-					to_ret+='\tstruct dyn_obj* '+str(j.var)+'=args['+str(iii+1)+'];\n'
-			to_ret+="".join(["struct dyn_obj *"+iii.C()+";\n" for iii in ii[-1].localvars])
-			to_ret+=ii[-1].code.C()+"\n}\n\n"
-			return to_ret
-
 		for i in self.names:
 			if isinstance(i[-1],funcStatement):
+				i[-1].path=i
 				i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
+				#Method implementations
+				#Search for things in our list that match [PATH TO THE OBJECT][A FUNCTION]
 				for ii in self.names:
 					if i==ii[:-1] and isinstance(ii[-1],funcStatement) and ii[-1].name.name!="new":
-						to_ret+=funcGen(ii)
+						to_ret+=ii[-1].genDef()
 
 				if i[-1].new:
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(i[-1].new[-1].minLen()-1)+','+str(i[-1].new[-1].maxLen()-1)+',protect({'+(''.join(['"'+str(ii.var)+'",' for ii in i[-1].new[-1].param]))+'}),protect({'+(','.join([("((struct factory_obj*)"+str(ii.type.C())+")->type_to_create") if ii.type else "TYPE" for ii in i[-1].new[-1].param]))+'}));\n\t#endif\n\tobject_setup('+i[-1].enum+');\n\t'
@@ -1494,7 +1495,7 @@ class declGen():
 					to_ret+="def_dyn_fn(FN_"+i[-1].fullname+'_new)\n{\n\tstruct dyn_obj *self = call_method(*type_parent_list['+i[-1].enum+'],"new",arg_count,args);\n\tself->cur_type = '+i[-1].enum+';\n\tbind_member(self,"parent",*type_parent_list[self->cur_type]);\n\tinit_methods(self,type_method_lists[self->cur_type]);\n\treturn self;\n}\n'
 
 			elif (isinstance(i[-1],funcStatement) and len(i)==1) or (len(i)>1 and isinstance(i[-1],funcStatement) and isinstance(i[-2],funcStatement)): #Top level global functions
-				to_ret+=funcGen(i)
+				to_ret+=i[-1].genDef()
 		to_ret+="int main()\n{\n\tGC_INIT();\n\tcreate_global();\n\tstruct dyn_obj *self;\n\tself=kw_global;\n"
 
 		declared_vars={}
