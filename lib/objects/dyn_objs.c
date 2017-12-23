@@ -290,10 +290,23 @@ bool is_child(struct dyn_obj *obj,enum type type_id)
 	{
 		return true;
 	}
-	//Descend through the linked list of parents until we reach the TYPE object or a match
-	for (struct dyn_obj *i=obj;!(i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==TYPE);i=get_member(i,"parent"))
+	struct dyn_obj *i=obj;
+	//Deal with the first item being an actual object rather than a factory
+	if (type_id!=FACTORY)
 	{
-		if (type_id==obj->cur_type || (i->cur_type==FACTORY && ((struct factory_obj*)i)->type_to_create==type_id))
+		if (obj->cur_type==type_id)
+		{
+			return true;
+		}
+		else
+		{
+			i=*type_parent_list[obj->cur_type];
+		}
+	}
+	//At this point the object in i WILL be a factory, we can go jump through the table til we find a match or the TYPE object
+	for (;((struct factory_obj*)i)->type_to_create!=TYPE;i=*type_parent_list[obj->cur_type])
+	{
+		if (((struct factory_obj*)i)->type_to_create==type_id)
 		{
 			return true;
 		}

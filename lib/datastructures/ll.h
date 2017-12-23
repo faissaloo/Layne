@@ -19,6 +19,5 @@
 struct ll_item
 {
 	void *data;
-	struct ll_item *prev;
 	struct ll_item *next;
 };
