@@ -440,6 +440,12 @@ class iBitNotAssign(unaryAssignment):
 class assignment(dyadicOp):
 	pass
 
+class dictPlaceHolder():
+	def __repr__(self):
+		return "<EMPTY DICT>"
+	def C(self):
+		return "{NULL,NULL}"
+
 class dictItemOp(dyadicOp):
 	def __repr__(self):
 		return "("+str(self.operand1)+":"+str(self.operand2)+")"
@@ -629,8 +635,10 @@ class brackExpr(list):
 		return str(self.tree)
 
 	def C(self):
-		if all(type(i) is dictItemOp for i in self):
+		if all(type(i) is dictItemOp for i in self) and len(self)!=0:
 			return 'create_dict(dyn_obj_ht_from('+str(len(self))+',(struct ht_item_init[]){'+(','.join([i.C() for i in self]))+'}))'
+		elif len(self)==1 and type(self[0]) is dictPlaceHolder:
+			return 'create_dict(NULL)'
 		else:
 			return 'create_array(dyn_array_from('+str(len(self))+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
 
@@ -900,6 +908,9 @@ class ast():
 	def isUnary(self):
 		return self.cursor-1<0 or isinstance(self[self.cursor-1],token)
 
+	def isDyadic(self):
+		return (self.cursor-1>=0 and self.cursor+1<len(self)) and (not (isinstance(self[self.cursor-1],token) or isinstance(self[self.cursor+1],token)))
+
 	def consumeUnary(self,obj):
 		if self.cursor+1>=len(self):
 			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
@@ -1140,7 +1151,11 @@ def parseLayer(tokens,noAssign=False):
 		if isinstance(i,token):
 			if i.cat=="mdop":
 				if i.tok==":":
-					tree.consumeDyadic(dictItemOp)
+					if tree.isDyadic():
+						tree.consumeDyadic(dictItemOp)
+					else:
+						tree.tree.insert(tree.cursor,dictPlaceHolder())
+						tree.tree.pop(tree.cursor+1)
 	for i in tree:
 		if isinstance(i,token):
 			if i.cat=="mdop":
