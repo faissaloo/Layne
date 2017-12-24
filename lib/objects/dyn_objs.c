@@ -25,6 +25,7 @@
 #include "dyn_arrays.h"
 #include "dyn_str.h"
 #include "hash_tables.h"
+#include "ll.h"
 
 #include "global_obj.h"
 #include "none_obj.h"
@@ -149,6 +150,7 @@ struct dyn_obj* p_bool(int input)
 {
 	return input?kw_true:kw_false;
 }
+
 struct dyn_obj* get_member(struct dyn_obj *obj,char member_name[])
 {
 	void *member;
@@ -196,13 +198,13 @@ struct dyn_obj* copy_obj(struct dyn_obj *obj, struct hash_table *spanned_objs)
 	{
 		if ((*obj->members->items)[i]!=NULL)
 		{
-			for (int ii=0;ii < (*obj->members->items)[i]->filled;ii++)
+			for (struct ll_item *ii=(*obj->members->items)[i];ii->next!=NULL;ii=ii->next)
 			{
 				struct dyn_obj *mmbr_to_copy;
 				struct dyn_obj *copied_mmbr;
 				struct hash_table_item *mmbr_hash_entry;
 
-				mmbr_hash_entry=dyn_array_get((*obj->members->items)[i],ii);
+				mmbr_hash_entry=ii->data;
 				mmbr_to_copy=mmbr_hash_entry->data;
 				if (hash_table_get(spanned_objs,mmbr_to_copy)==NULL)
 				{

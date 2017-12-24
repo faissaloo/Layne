@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "dyn_arrays.h"
-#include "hash_tables.h"
 #include <string.h>
 #include <gc.h>
-//http://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)HashTables.html?highlight=(CategoryAlgorithmNotes)
+
+#include "ll.h"
+#include "dyn_arrays.h"
+#include "hash_tables.h"
 
 //How much to expand by each time
 #define block_size 128
@@ -53,9 +54,10 @@ hash_t hash_string(void *in_str)
 
 struct hash_table* hash_table_create(int (*cmp_func)(void *,void *),hash_t (*hash_func)(void *))
 {
-	struct hash_table *self=GC_MALLOC(sizeof(struct hash_table));
+	struct hash_table *self;
+	self=GC_MALLOC(sizeof(struct hash_table));
 	self->table_size=block_size;
-	self->items=GC_MALLOC(sizeof(struct hash_table_item*)*(self->table_size));
+	self->items=GC_MALLOC(sizeof(struct ll_item*)*(self->table_size));
 	self->cmp_func=cmp_func;
 	self->hash_func=hash_func;
 	return self;
@@ -73,31 +75,29 @@ struct hash_table* hash_table_from(int (*cmp_func)(void *,void *), hash_t (*hash
 
 void hash_table_grow(struct hash_table *self)
 {
-	struct dyn_array *(*old_items)[]=self->items;
-	self->items=GC_MALLOC(sizeof(struct dyn_array*)*(self->table_size+block_size));
+	struct ll_item *(*old_items)[]=self->items;
+	self->items=GC_MALLOC(sizeof(struct ll_item*)*(self->table_size+block_size));
 
 	//Refill the new list with the old stuff
 	for (iter_t i = 0;i < self->table_size;i++)
 	{
 		if ((*old_items)[i]!=NULL)
 		{
-			(*(self->items))[((struct hash_table_item*)dyn_array_get((*old_items)[i],0))->key_hash%self->table_size+block_size]=(*old_items)[i];
+			(*(self->items))[((struct hash_table_item*)((*old_items)[i]->data))->key_hash%(self->table_size+block_size)]=(*old_items)[i];
 		}
 	}
-	//free(old_items);
 	self->table_size+=block_size;
 }
 
 void hash_table_shrink(struct hash_table *self)
 {
-	struct dyn_array *(*old_items)[]=self->items;
-	self->items=GC_MALLOC(sizeof(struct dyn_array*)*(self->table_size-block_size));
+	struct ll_item *(*old_items)[]=self->items;
+	self->items=GC_MALLOC(sizeof(struct ll_item*)*(self->table_size-block_size));
 	for (int i = 0;i < self->table_size;i++)
 	{
 		if ((*old_items)[i]!=NULL)
 		{
-
-			(*(self->items))[((struct hash_table_item*)dyn_array_get((*old_items)[i],0))->key_hash%self->table_size-block_size]=(*old_items)[i];
+			(*(self->items))[((struct hash_table_item*)((*old_items)[i]->data))->key_hash%(self->table_size-block_size)]=(*old_items)[i];
 		}
 	}
 	self->table_size-=block_size;
@@ -109,7 +109,7 @@ void hash_table_remove(struct hash_table *self, void *key)
 	key_hash=(self->hash_func)(key);
 	unsigned int index;
 	index=key_hash%self->table_size;
-	if ((*(self->items))[index]->filled==0)
+	if ((*(self->items))[index]->next==NULL)
 	{
 		(*(self->items))[index]=NULL;
 		if (--self->table_filled < self->table_size-block_size)
@@ -119,13 +119,13 @@ void hash_table_remove(struct hash_table *self, void *key)
 	}
 	else
 	{
-		for (iter_t i=0;i < (*(self->items))[index]->filled;i++)
+		struct ll_item **indirect;
+		indirect=&(*(self->items))[index];
+		while ((self->cmp_func)(((struct hash_table_item*)(*indirect)->data)->key,key))
 		{
-			if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get((*(self->items))[index],i))->key,key))
-			{
-				dyn_array_remove((*(self->items))[index],i);
-			}
+			indirect=&(*indirect)->next;
 		}
+		*indirect=(*indirect)->next;
 	}
 }
 
@@ -136,7 +136,8 @@ void hash_table_add(struct hash_table *self, void *key, void *data)
 		hash_table_grow(self);
 	}
 
-	struct hash_table_item *new_item=GC_MALLOC(sizeof(struct hash_table_item));
+	struct hash_table_item *new_item;
+	new_item=GC_MALLOC(sizeof(struct hash_table_item));
 	new_item->key_hash=(self->hash_func)(key);
 	new_item->key=key;
 	new_item->data=data;
@@ -144,38 +145,41 @@ void hash_table_add(struct hash_table *self, void *key, void *data)
 	index=new_item->key_hash%self->table_size;
 	if ((*(self->items))[index]==NULL)
 	{
-		(*(self->items))[index]=dyn_array_create();
+		(*(self->items))[index]=GC_MALLOC(sizeof(struct ll_item));
+		(*(self->items))[index]->data=new_item;
+		(*(self->items))[index]->next=NULL;
 	}
 	else
 	{
 		//Overwrite if this item already exists
-		for (iter_t i=0;i < (*(self->items))[index]->filled;i++)
+		struct ll_item *i=(*(self->items))[index];
+		for (;i->next!=NULL;i=i->next)
 		{
-			if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get((*(self->items))[index],i))->key,key))
+			if ((self->cmp_func)(((struct hash_table_item*)i->data)->key,key))
 			{
-				dyn_array_set((*(self->items))[index],i,new_item);
+				i->data=new_item;
 				return;
 			}
 		}
+		//Append if item does not exist
+		i->next=GC_MALLOC(sizeof(struct ll_item));
+		i->next->data=new_item;
+		i->next->next=NULL;
 	}
-	//If we didn't find an already existing item with the hash
-	dyn_array_append((*(self->items))[index],new_item);
 }
 
 void *hash_table_get(struct hash_table *self, void *key)
 {
-	struct dyn_array *array=(*(self->items))[(self->hash_func)(key)%self->table_size];
-	if (array==NULL)
+	struct ll_item *ll=(*(self->items))[(self->hash_func)(key)%self->table_size];
+
+	while (ll)
 	{
-		return NULL;
+		if ((self->cmp_func)(((struct hash_table_item*)ll->data)->key,key))
+		{
+			return ((struct hash_table_item*)ll->data)->data;
+		}
+		ll=ll->next;
 	}
 
-	for (unsigned int i=0;i < array->filled;i++)
-	{
-		if ((self->cmp_func)(((struct hash_table_item*)dyn_array_get(array,i))->key,key))
-		{
-			return ((struct hash_table_item*)dyn_array_get(array,i))->data;
-		}
-	}
 	return NULL;
 }

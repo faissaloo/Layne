@@ -59,6 +59,7 @@ struct dyn_obj* create_global()
 	create_flt_factory();
 	create_str_factory();
 	bind_member(self,"type",type_factory);
+	bind_member(self,"parent",*type_parent_list[GLOBAL]); //Temporary fix for GLOBAL having no parent
 	bind_member(self,"int",int_factory);
 	bind_member(self,"flt",flt_factory);
 	bind_member(self,"bool",bool_factory);

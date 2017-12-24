@@ -186,18 +186,6 @@ struct dyn_obj
 	//The data stored is a function
 	enum type cur_type;
 };
-/*
-struct array_obj
-{
-	struct type_obj parent;
-	struct dyn_array data;
-};
-
-struct dict_obj
-{
-	struct type_obj parent;
-
-};*/
 
 void bind_member(struct dyn_obj *obj, char member_name[], struct dyn_obj *member_obj);
 void bind_method(struct dyn_obj *obj,char method_name[],struct dyn_obj* (*cfunc)(size_t arg_count, struct dyn_obj *args[]));

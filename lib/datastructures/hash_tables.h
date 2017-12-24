@@ -36,8 +36,8 @@ struct hash_table_item
 
 struct hash_table
 {
-	//We're using an array of dynamic arrays of hash_table_items here in case of hash collisions
-	struct dyn_array *(*items)[];
+	//We're using an array of linked lists of hash_table_items here in case of hash collisions
+	struct ll_item *(*items)[];
 	//Old version, without hash collision handling
 	//struct hash_table_item *(*items)[];
 	unsigned int table_size;
