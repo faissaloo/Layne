@@ -810,6 +810,11 @@ class funcStatement(newContextStatement):
 
 		self.param=funcParamList(self.prototype.parenthExpr.tree)
 
+	def setPath(self,path):
+		self.path=path
+		#Note: if i.names have dots in them we need to collapse them
+		self.cfunc="FN_"+("_".join([str(i.name) for i in self.path]))
+
 	def minLen(self):
 		return self.param.minLen()
 
@@ -818,8 +823,7 @@ class funcStatement(newContextStatement):
 
 	def genDef(self):
 		to_ret=""
-		to_ret+=("def_dyn_fn(FN_"+
-			("_".join([str(iii.name) for iii in self.path]))+
+		to_ret+=("def_dyn_fn("+self.cfunc+
 			')\n{\n\t#ifdef DEBUG\n\t\targ_guard('+str(self.minLen())+','+str(self.maxLen())+',protect({"self"'+
 			(''.join([',"'+str(iii.var)+'"' for iii in self.param]))+
 			'}),protect({TYPE'+(''.join([(",((struct factory_obj*)"+str(iii.type.C())+")->type_to_create") if iii.type else ",TYPE" for iii in self.param]))+
@@ -1487,8 +1491,7 @@ class declGen():
 				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tfactory_setup("+i[-1].enum+');\n\t'+i[-1].enum+"_factory"+'=self;\n}\n'
 		for i in self.names:
 			if isinstance(i[-1],funcStatement):
-				i[-1].path=i
-				i[-1].cfunc="FN_"+("_".join([str(ii.name) for ii in i]))
+				i[-1].setPath(i)
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
