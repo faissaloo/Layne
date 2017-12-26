@@ -298,6 +298,16 @@ class isOp(dyadicOp):
 		return "("+self.operand1.__repr__()+" ?= "+self.operand2.__repr__()+")"
 
 class dotOp(dyadicOp):
+	def collapse(self):
+		#Returns a list that corresponds to the chain the dots form
+		collapsedDots=[]
+		i=self
+		while isinstance(i,dotOp):
+			collapsedDots.insert(0,i.operand2)
+			i=i.operand1
+		collapsedDots.insert(0,i)
+		return collapsedDots
+
 	def C(self):
 		return "get_member("+self.operand1.C()+',"'+self.operand2.C()+'")'
 
@@ -305,6 +315,16 @@ class dotOp(dyadicOp):
 		return "("+self.operand1.__repr__()+" . "+self.operand2.__repr__()+")"
 
 class commaOp(dyadicOp):
+	def collapse(self):
+		#Returns a list that corresponds to the chain the commas form
+		collapsedCommas=[]
+		i=self
+		while isinstance(i,commaOp):
+			collapsedCommas.insert(0,i.operand2)
+			i=i.operand1
+		collapsedCommas.insert(0,i)
+		return collapsedCommas
+
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" , "+self.operand2.__repr__()+")"
 
@@ -680,18 +700,20 @@ class funcCall():
 	def __repr__(self):
 		return str(self.name)+"("+str(self.parenthExpr)+")"
 
+	def getArgs(self):
+		if isinstance(self.parenthExpr.tree,commaOp): #Numerous arguments
+			return self.parenthExpr.tree.collapse()
+		elif self.parenthExpr.tree: #1 argument
+			return [self.parenthExpr.tree]
+		else: #No arguments
+			return []
+
 	def C(self):
-		args=[]
-		i=self.parenthExpr.tree
-		while isinstance(i,commaOp):
-			args.insert(0,i.operand2.C())
-			i=i.operand1
-		if i:
-			args.insert(0,i.C())
+		cArgs=[i.C() for i in self.getArgs()]
 		if isinstance(self.name,dotOp):
-			return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",'+str(len(args))+',(struct dyn_obj*[]){'+(','.join(args))+'})'
+			return "call_method("+self.name.operand1.C()+',"'+self.name.operand2.C()+'",'+str(len(cArgs))+',(struct dyn_obj*[]){'+(','.join(cArgs))+'})'
 		else:
-			return "call_function("+self.name.C()+','+str(len(args)+1)+',(struct dyn_obj*[]){create_none(),'+(','.join(args))+'})'
+			return "call_function("+self.name.C()+','+str(len(cArgs)+1)+',(struct dyn_obj*[]){create_none(),'+(','.join(cArgs))+'})'
 
 class statement():
 	pass
