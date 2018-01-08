@@ -20,4 +20,5 @@ struct ll_item
 {
 	void *data;
 	struct ll_item *next;
+	struct ll_item *prev; //Move this to a seperate double linked list datastructure later
 };
