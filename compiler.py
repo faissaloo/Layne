@@ -768,15 +768,25 @@ class objStatement(newContextStatement):
 		self.parent=parent
 		self.parentContext=None
 		self.enum=None
+		self.path=[]
 		self.fullname="" #Including the path, like enum without the prefix
 		self.methods=[]
 		self.new=None
+
+	def setPath(self,path):
+		self.path=path
+		#Collapse dotOps and build the internal object name from the path
+		self.fullname="_".join(["_".join([ii.C() for ii in i.name.collapse()]) if isinstance(i.name,dotOp) else i.name.C() for i in self.path])
+		self.enum="OBJ_"+self.fullname
 
 	def __repr__(self):
 		return "OBJ "+self.name.name+" FROM "+(str(self.parent) if self.parent else "")+""+"\n"+str(self.code)
 
 	def C(self):
-		return 'struct dyn_obj *'+self.name.C()+'=*type_factory_list['+self.enum+'];\n'
+		if isinstance(self.name,dotOp):
+			return 'bind_member('+self.name.operand1.C()+',"'+self.name.operand2.C()+'",*type_factory_list['+self.enum+']);\n'
+		else:
+			return 'struct dyn_obj *'+self.name.C()+'=*type_factory_list['+self.enum+'];\n'
 
 class funcParamList(list):
 	def __init__(self,tree):
@@ -834,8 +844,8 @@ class funcStatement(newContextStatement):
 
 	def setPath(self,path):
 		self.path=path
-		#Note: if i.names have dots in them we need to collapse them
-		self.cfunc="FN_"+("_".join([str(i.name) for i in self.path]))
+		#Collapse dotOps and build the internal function name from the path
+		self.cfunc="FN_"+("_".join(["_".join([ii.C() for ii in i.name.collapse()]) if isinstance(i.name,dotOp) else i.name.C() for i in self.path]))
 
 	def minLen(self):
 		return self.param.minLen()
@@ -863,7 +873,10 @@ class funcStatement(newContextStatement):
 
 	#This just binds the real name of the C function to the object with bind_method
 	def C(self):
-		return 'struct dyn_obj *'+self.name.C()+' = create_function('+self.cfunc+');\n'
+		if isinstance(self.name,dotOp):
+			return 'bind_member('+self.name.operand1.C()+',"'+self.name.operand2.C()+'",create_function('+self.cfunc+'));\n'
+		else:
+			return 'struct dyn_obj *'+self.name.C()+'=create_function('+self.cfunc+');\n'
 
 	def __repr__(self):
 		return "FUNCTION "+str(self.prototype)+"\n"+str(self.code)
@@ -941,7 +954,7 @@ class ast():
 		if self.cursor+1>=len(self):
 			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
 
-		if isinstance(self[self.cursor-1],token):
+		if self.cursor-1>=0 and isinstance(self[self.cursor-1],token):
 			compilerError("Invalid syntax",self[self.cursor].line,self[self.cursor].col)
 
 		newObj=obj(self[self.cursor+1])
@@ -1449,8 +1462,7 @@ class declGen():
 		genedEnums=[]
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
-				i[-1].fullname="_".join([str(ii.name) for ii in i])
-				i[-1].enum="OBJ_"+i[-1].fullname
+				i[-1].setPath(i)
 				genedEnums.append(i[-1].enum)
 		return "\t,\n\t"+(",\n\t".join(genedEnums))+"\n"
 
@@ -1461,31 +1473,35 @@ class declGen():
 		to_ret="#ifndef MAIN_H\n#define MAIN_H\n"
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
-				to_ret+='extern struct method_list OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_methods;\n'
-				to_ret+='extern struct dyn_obj *OBJ_'+('_'.join([str(ii.name) for ii in i]))+'_factory;\n'
+				to_ret+='extern struct method_list '+i[-1].enum+'_methods;\n'
+				to_ret+='extern struct dyn_obj *'+i[-1].enum+'_factory;\n'
 		to_ret+="#endif\n"
 		return to_ret
 
 	def genObjMethodListRefs(self):
 		if self.objNames:
-			return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+			return '\t,\n\t&'+(',\n\t&'.join([i[-1].enum+"_methods" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
 		else:
 			return ""
 
 	def genFactoryListRefs(self):
 		if self.objNames:
-			return '\t,\n\t&'+(',\n\t&'.join(["OBJ_"+"_".join([str(ii.name) for ii in i])+"_factory" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
+			return '\t,\n\t&'+(',\n\t&'.join([i[-1].enum+"_factory" for i in self.names if isinstance(i[-1],objStatement)]))+'\n'
 		else:
 			return ""
 
 	def genMain(self):
 		to_ret='#include <stdio.h>\n#include "main.h"\n#include <gc.h>\n#include "global_obj.h"\n#include "dyn_objs.h"\n#include "factory_obj.h"\n#include "func_obj.h"\n#include "int_obj.h"\n#include "flt_obj.h"\n#include "str_obj.h"\n#include "type_obj.h"\n#include "bool_obj.h"\n#include "none_obj.h"\n#include "array_obj.h"\n#include "dict_obj.h"\n#include "ll.h"\n#include "debug.h"\n'
 		for i in self.names:
+			if isinstance(i[-1],funcStatement):
+				i[-1].setPath(i)
+
+		for i in self.names:
 			if isinstance(i[-1],objStatement):
 				has_new=False
 				for ii in self.names:
 					if isinstance(ii[-1],funcStatement):
-						if ii[-1].name.name=="new":
+						if (isinstance(ii[-1].name,dotOp) and ii[-1].name.collapse()[-1].name=="new") or ((not isinstance(ii[-1].name,dotOp)) and ii[-1].name.name=="new"):
 							i[-1].new=ii
 						elif i==ii[:-1]:
 							i[-1].methods.append(ii)
@@ -1495,7 +1511,7 @@ class declGen():
 		#Backwards declarations
 		for i in self.names:
 			if isinstance(i[-1],funcStatement):
-				to_ret+='decl_dyn_fn(FN_'+("_".join([str(ii.name) for ii in i]))+');\n'
+				to_ret+='decl_dyn_fn('+i[-1].cfunc+');\n'
 
 		#Method lists
 		for i in self.names:
@@ -1503,7 +1519,7 @@ class declGen():
 				to_ret+="struct method_list "+i[-1].enum+"_methods = {\n"
 				to_ret+="\t"+str(len(i[-1].methods)+1)+",\n\t{\n"
 				for ii in i[-1].methods:
-					to_ret+='\t\tmethod_pair("'+str(ii[-1].name)+'",FN_'+("_".join([str(iii.name) for iii in ii]))+"),\n"
+					to_ret+='\t\tmethod_pair("'+str(ii[-1].name.collapes()[-1] if isinstance(ii[-1].name,dotOp) else ii[-1].name)+'",'+ii[-1].cfunc+"),\n"
 				to_ret+='\t\tmethod_pair("new",FN_'+i[-1].fullname+"_new),\n"
 				to_ret+="\t}\n};\n\n"
 
@@ -1511,9 +1527,6 @@ class declGen():
 			if isinstance(i[-1],objStatement):
 				to_ret+='struct dyn_obj *'+i[-1].enum+'_factory;'
 				to_ret+="void create_"+i[-1].enum+"_factory()\n{\n\tfactory_setup("+i[-1].enum+');\n\t'+i[-1].enum+"_factory"+'=self;\n}\n'
-		for i in self.names:
-			if isinstance(i[-1],funcStatement):
-				i[-1].setPath(i)
 
 		for i in self.names:
 			if isinstance(i[-1],objStatement):
