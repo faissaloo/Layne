@@ -67,11 +67,14 @@ def tokenise():
 	lineNum=0
 	colNum=0
 	def appendToken():
-		if curType!="whitespace":
+		if curType not in ("whitespace","comment"):
 			tokens.append(token(curType,curToken,lineNum,colNum))
 	for i in txt:
 		#String quotes
-		if i=="'":
+		if curType=="comment" and i!="\n":
+			curToken+=i
+			print(curToken)
+		elif i=="'":
 			if curType!="oquote":
 				appendToken()
 				curType="oquote"
@@ -180,6 +183,14 @@ def tokenise():
 		elif i=="$":
 			curType="uaiop"
 			curToken+=i
+		elif i == "/":
+			if curType=="dop" and curToken=="/":
+				curType="comment"
+				curToken=""
+			else:
+				appendToken()
+				curType="dop"
+				curToken=i
 		#Raw simple dyadic operations
 		elif i in "/*%|&^":
 			appendToken()
