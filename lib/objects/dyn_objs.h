@@ -144,7 +144,7 @@ enum type
 	FLT,
 	BOOL,
 	STR,
-	ARRAY,
+	LST,
 	DICT,
 	TERM,
 	LST_ITER,

@@ -33,7 +33,7 @@
 #include "flt_obj.h"
 #include "bool_obj.h"
 #include "str_obj.h"
-#include "array_obj.h"
+#include "lst_obj.h"
 #include "dict_obj.h"
 #include "func_obj.h"
 #include "factory_obj.h"
@@ -52,7 +52,7 @@ const char *type_names[]={
 	"flt",
 	"bool",
 	"str",
-	"array",
+	"lst",
 	"dict",
 	"term",
 	"lst_iter",
@@ -70,7 +70,7 @@ size_t type_sizes[]={
 	sizeof(struct flt_obj),
 	sizeof(struct bool_obj),
 	sizeof(struct str_obj),
-	sizeof(struct array_obj),
+	sizeof(struct lst_obj),
 	sizeof(struct dict_obj),
 	sizeof(struct term_obj),
 	sizeof(struct lst_iter_obj),
@@ -90,7 +90,7 @@ struct method_list *type_method_lists[]={
 	&flt_methods,
 	&bool_methods,
 	&str_methods,
-	&array_methods,
+	&lst_methods,
 	&dict_methods,
 	&term_methods,
 	&lst_iter_methods,
@@ -108,7 +108,7 @@ struct dyn_obj **type_factory_list[]={
 	&flt_factory,
 	&bool_factory,
 	&str_factory,
-	NULL, //Unimplemeted (array)
+	NULL, //Unimplemeted (lst)
 	NULL, //Unimplemented (dict)
 	NULL, //Unimplemented (term)
 	NULL, //Unimplemented (lst_iter)
@@ -126,7 +126,7 @@ struct dyn_obj **type_parent_list[]={
 	&type_factory, //Flt
 	&type_factory, //Bool
 	&type_factory, //Str
-	&type_factory, //Array
+	&type_factory, //Lst
 	&type_factory, //Dict
 	&type_factory, //term
 	&type_factory, //lst_iter

@@ -25,7 +25,7 @@
 #include "int_obj.h"
 #include "flt_obj.h"
 #include "bool_obj.h"
-#include "array_obj.h"
+#include "lst_obj.h"
 #include "factory_obj.h"
 
 struct method_list str_methods={
@@ -151,7 +151,7 @@ def_dyn_fn(str_lst)
 	{
 		dyn_array_append(char_lst,create_str(dyn_str_get_char(((struct str_obj*)SELF)->data,i)));
 	}
-	return create_array(char_lst);
+	return create_lst(char_lst);
 }
 
 def_dyn_fn(str_iter)

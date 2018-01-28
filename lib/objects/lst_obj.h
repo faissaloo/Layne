@@ -15,31 +15,31 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Layne.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef ARRAY_OBJ_H
-#define ARRAY_OBJ_H
+#ifndef LST_OBJ_H
+#define LST_OBJ_H
 
 #include "dyn_objs.h"
 #include "type_obj.h"
 #include "dyn_arrays.h"
 
-struct dyn_obj *create_array_factory();
-struct dyn_obj* create_array(struct dyn_array *ary);
-struct array_obj
+struct dyn_obj *create_lst_factory();
+struct dyn_obj* create_lst(struct dyn_array *ary);
+struct lst_obj
 {
 	struct type_obj parent;
 	struct dyn_array *data;
 };
 
-extern struct method_list array_methods;
-decl_dyn_fn(array_new);
-decl_dyn_fn(array_set);
-decl_dyn_fn(array_ins);
-decl_dyn_fn(array_rm);
-decl_dyn_fn(array_get);
-decl_dyn_fn(array_len);
-decl_dyn_fn(array_eq);
-decl_dyn_fn(array_str);
-decl_dyn_fn(array_hash);
-decl_dyn_fn(array_iter);
-decl_dyn_fn(array_copy);
+extern struct method_list lst_methods;
+decl_dyn_fn(lst_new);
+decl_dyn_fn(lst_set);
+decl_dyn_fn(lst_ins);
+decl_dyn_fn(lst_rm);
+decl_dyn_fn(lst_get);
+decl_dyn_fn(lst_len);
+decl_dyn_fn(lst_eq);
+decl_dyn_fn(lst_str);
+decl_dyn_fn(lst_hash);
+decl_dyn_fn(lst_iter);
+decl_dyn_fn(lst_copy);
 #endif
