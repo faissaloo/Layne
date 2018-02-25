@@ -671,7 +671,7 @@ class brackExpr(list):
 		elif len(self)==1 and type(self[0]) is dictPlaceHolder:
 			return 'create_dict(NULL)'
 		else:
-			return 'create_array(dyn_array_from('+str(len(self))+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
+			return 'create_lst(dyn_array_from('+str(len(self))+',(void *[]){'+(','.join([i.C() for i in self]))+'}))'
 
 class blockExpr(list):
 	def __init__(self,tree):
