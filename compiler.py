@@ -73,7 +73,6 @@ def tokenise():
 		#String quotes
 		if curType=="comment" and i!="\n":
 			curToken+=i
-			print(curToken)
 		elif i=="'":
 			if curType!="oquote":
 				appendToken()
