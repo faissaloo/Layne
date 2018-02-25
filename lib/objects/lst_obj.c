@@ -132,7 +132,7 @@ def_dyn_fn(lst_ins)
 def_dyn_fn(lst_rm)
 {
 	#ifdef DEBUG
-		arg_guard(2,2,protect({"self","index"}),protect({lst,INT}));
+		arg_guard(2,2,protect({"self","index"}),protect({LST,INT}));
 	#endif
 	dyn_array_remove(((struct lst_obj*)SELF)->data,get_int_val(args[1]));
 	return kw_none;
@@ -172,7 +172,7 @@ def_dyn_fn(lst_str)
 def_dyn_fn(lst_hash)
 {
 	#ifdef DEBUG
-		arg_guard(1,1,protect({"self"}),protect({lst}));
+		arg_guard(1,1,protect({"self"}),protect({LST}));
 	#endif
 	hash_t hash;
 	hash=0;
