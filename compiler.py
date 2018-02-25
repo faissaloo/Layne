@@ -893,11 +893,13 @@ class funcStatement(newContextStatement):
 		return "FUNCTION "+str(self.prototype)+"\n"+str(self.code)
 
 class elseStatement(inheritContextStatement):
-	def __init__(self,initial,secondary):
-		self.initial=initial
+	def __init__(self,primary,secondary):
+		self.primary=primary
 		self.secondary=secondary
 	def __repr__(self):
-		return "\n"+str(self.initial)+"\nELSE\n"+str(self.secondary)
+		return "\n"+str(self.primary)+"\nELSE\n"+str(self.secondary)
+	def C(self):
+		return self.primary.C()+"\nelse\n"+self.secondary.C()
 
 class ast():
 	def __init__(self,tokens,sourcecode):
@@ -1161,9 +1163,9 @@ def parseLayer(tokens,noAssign=False):
 	def assignError(tree,noAssign):
 		if noAssign or isinstance(tree[tree.cursor-1],assignment) or isinstance(tree[tree.cursor+1],assignment) or (isinstance(tree[tree.cursor-1],equalOp)):
 			compilerError("Cannot assign in expression",tree[tree.cursor].line,tree[tree.cursor].col)
-
+	
 	for i in tree:
-		if type(i) is tuple:
+		if isinstance(i,token):
 			if i.cat=="dop":
 				if i.tok=="@=":
 					assignError(tree,noAssign)
@@ -1437,6 +1439,9 @@ class declGen():
 				elif isinstance(i,funcStatement):
 					self.names.append(context+[i])
 					self.names.extend(declGen(i.code,context+[i]))
+				elif isinstance(i,elseStatement):
+					self.names.extend(declGen(i.primary,context))
+					self.names.extend(declGen(i.secondary,context))
 				elif isinstance(i,inheritContextStatement):
 					self.names.extend(declGen(i.code,context))
 				elif isinstance(i,blockExpr):
@@ -1447,6 +1452,9 @@ class declGen():
 		elif isinstance(syntree,funcStatement):
 			self.names.append(context+[syntree])
 			self.names.extend(declGen(syntree.code,context+[syntree]))
+		elif isinstance(syntree,elseStatement):
+			self.names.extend(declGen(syntree.primary,context))
+			self.names.extend(declGen(syntree.secondary,context))
 		elif isinstance(syntree,inheritContextStatement):
 			self.names.extend(declGen(syntree.code,context))
 
