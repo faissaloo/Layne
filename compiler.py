@@ -397,6 +397,8 @@ class addOp(dyadicOp):
 class minusOp(dyadicOp):
 	def __repr__(self):
 		return "("+self.operand1.__repr__()+" - "+self.operand2.__repr__()+")"
+	def C(self):
+		return 'call_method('+self.operand1.C()+',"sub",1,(struct dyn_obj*[]){'+self.operand2.C()+'})'
 
 class bitNotOp(unaryOp):
 	def __repr__(self):
